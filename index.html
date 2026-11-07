@@ -7,13 +7,13 @@
   <style>
     :root {
       --bg-dark: #07090e;
-      --card-bg: rgba(18, 24, 38, 0.65);
+      --card-bg: rgba(18, 24, 38, 0.75);
       --border-steel: rgba(255, 255, 255, 0.15);
       --accent-cyan: #00f2fe;
       --accent-pink: #ff0050;
       --text-main: #f0f6fc;
       --text-muted: #8b949e;
-      --metal-gradient: linear-gradient(145deg, #161b22 0%, #0d1117 60%, #1c2128 100%);
+      --metal-gradient: linear-gradient(135deg, #1c2333 0%, #0d1117 50%, #161b22 100%);
       --glow-cyan: 0 0 20px rgba(0, 242, 254, 0.4);
       --glow-pink: 0 0 20px rgba(255, 0, 80, 0.4);
     }
@@ -48,16 +48,24 @@
 
     .auth-submit-btn { width: 100%; margin-top: 10px; background: linear-gradient(90deg, #00f2fe, #4facfe); border: none; color: #000; font-weight: 800; padding: 14px; border-radius: 12px; cursor: pointer; font-size: 14px; }
 
-    /* Header */
+    /* Header with Metallic Gradient Logo */
     .xok-header {
       position: fixed; top: 0; left: 0; right: 0; height: 64px; padding: 0 20px;
       display: flex; justify-content: space-between; align-items: center; z-index: 100;
       background: linear-gradient(to bottom, rgba(7, 9, 14, 0.9), transparent); backdrop-filter: blur(12px);
     }
+    .xok-logo {
+      font-weight: 900; font-size: 22px; letter-spacing: 1.5px;
+      background: linear-gradient(135deg, #00f2fe 0%, #ffffff 50%, #ff0050 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 0 10px rgba(0,242,254,0.4));
+      cursor: pointer;
+    }
     .btn-create { background: linear-gradient(90deg, var(--accent-cyan), #00c6ff); color: #000; border: none; font-weight: 800; padding: 8px 16px; border-radius: 20px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 13px; box-shadow: var(--glow-cyan); }
     .user-profile-badge { width: 38px; height: 38px; border-radius: 50%; border: 2px solid var(--accent-cyan); object-fit: cover; cursor: pointer; }
 
-    /* Scrollable Feed Fix */
+    /* Feed Container */
     .xok-container {
       width: 100vw; height: 100vh;
       overflow-y: scroll;
@@ -77,7 +85,7 @@
       display: flex; justify-content: space-between; align-items: flex-end; z-index: 20;
     }
     .user-info { display: flex; align-items: center; gap: 12px; max-width: 75%; }
-    .user-avatar-post { width: 44px !important; height: 44px !important; min-width: 44px !important; border-radius: 50% !important; object-fit: cover !important; border: 2px solid var(--accent-cyan) !important; box-shadow: var(--glow-cyan); }
+    .user-avatar-post { width: 44px !important; height: 44px !important; min-width: 44px !important; border-radius: 50% !important; object-fit: cover !important; border: 2px solid var(--accent-cyan) !important; box-shadow: var(--glow-cyan); cursor: pointer; }
 
     .sound-badge { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--accent-cyan); margin-top: 6px; }
 
@@ -89,7 +97,7 @@
     }
     .action-btn span { font-size: 10px; margin-top: 2px; color: var(--text-muted); }
 
-    /* Modal Bottom */
+    /* Modals (Profile, Comments, Upload) */
     .modal-bottom {
       position: fixed; bottom: -100%; left: 0; right: 0; height: 75vh;
       background: var(--metal-gradient); border-top: 1px solid var(--border-steel);
@@ -97,6 +105,16 @@
       padding: 20px; display: flex; flex-direction: column; box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.8);
     }
     .modal-bottom.active { bottom: 0; }
+
+    .profile-header-card { display: flex; align-items: center; gap: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--border-steel); }
+    .profile-avatar-large { width: 70px; height: 70px; border-radius: 50%; border: 2px solid var(--accent-cyan); object-fit: cover; }
+    .profile-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding-top: 16px; overflow-y: auto; flex: 1; }
+    .profile-grid-item { aspect-ratio: 9/16; background: #111; border-radius: 8px; overflow: hidden; }
+    .profile-grid-item video, .profile-grid-item img { width: 100%; height: 100%; object-fit: cover; }
+
+    .comments-list { flex: 1; overflow-y: auto; padding: 12px 0; display: flex; flex-direction: column; gap: 10px; }
+    .comment-item { display: flex; gap: 10px; background: rgba(0,0,0,0.3); padding: 8px 12px; border-radius: 10px; }
+    .comment-avatar { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; }
 
     .error-toast {
       position: fixed; top: 80px; left: 50%; transform: translateX(-50%);
@@ -107,11 +125,15 @@
 </head>
 <body>
 
+  <!-- SVG Icons -->
   <svg style="display: none;">
     <symbol id="icon-heart" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></symbol>
+    <symbol id="icon-comment" viewBox="0 0 24 24"><path d="M21.99 4c0-1.1-.89-2-1.99-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4-.01-18zM18 14H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/></symbol>
+    <symbol id="icon-share" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></symbol>
     <symbol id="icon-music" viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></symbol>
     <symbol id="icon-plus" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></symbol>
     <symbol id="icon-close" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></symbol>
+    <symbol id="icon-send" viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></symbol>
   </svg>
 
   <div id="errorToast" class="error-toast"></div>
@@ -143,21 +165,50 @@
     </div>
   </div>
 
-  <!-- Header -->
+  <!-- Header with Metallic Logo -->
   <header class="xok-header">
-    <div style="font-weight: 800; font-size: 18px; letter-spacing: 1px; color: var(--accent-cyan);">XOK</div>
+    <div class="xok-logo" onclick="window.scrollTo({top:0, behavior:'smooth'})">XOK</div>
     <div style="display:flex; align-items:center; gap:12px;">
       <button class="btn-create" onclick="openUpload()">
         <svg class="icon" style="fill:#000; width:16px; height:16px;"><use href="#icon-plus"/></svg> Создать
       </button>
-      <img id="headerAvatar" class="user-profile-badge" src="https://api.dicebear.com/7.x/bottts/svg?seed=Xok" alt="Profile" onclick="logout()">
+      <img id="headerAvatar" class="user-profile-badge" src="https://api.dicebear.com/7.x/bottts/svg?seed=Xok" alt="Profile" onclick="openProfile(currentUser ? currentUser.username : '@guest')">
     </div>
   </header>
 
   <!-- Feed -->
   <div class="xok-container" id="feed"></div>
 
-  <!-- Upload Modal with SoundCloud Integration -->
+  <!-- Profile Modal -->
+  <div id="profileModal" class="modal-bottom">
+    <div style="display:flex; justify-content:flex-end; padding-bottom:10px;">
+      <button onclick="closeProfile()" style="background:none; border:none; color:#fff; cursor:pointer;"><svg class="icon"><use href="#icon-close"/></svg></button>
+    </div>
+    <div class="profile-header-card">
+      <img id="profileAvatar" class="profile-avatar-large" src="" alt="Avatar">
+      <div>
+        <h2 id="profileName" style="font-size:18px;"></h2>
+        <span id="profileUserTag" style="font-size:13px; color:var(--text-muted);"></span>
+      </div>
+      <button onclick="logout()" style="margin-left:auto; background:none; border:1px solid var(--accent-pink); color:var(--accent-pink); padding:6px 12px; border-radius:10px; font-size:12px; cursor:pointer;">Выйти</button>
+    </div>
+    <div class="profile-grid" id="profileGrid"></div>
+  </div>
+
+  <!-- Comments Modal -->
+  <div id="commentsModal" class="modal-bottom">
+    <div style="display:flex; justify-content:space-between; align-items:center; padding-bottom:12px; border-bottom:1px solid var(--border-steel);">
+      <h3>Комментарии</h3>
+      <button onclick="closeComments()" style="background:none; border:none; color:#fff; cursor:pointer;"><svg class="icon"><use href="#icon-close"/></svg></button>
+    </div>
+    <div class="comments-list" id="commentsList"></div>
+    <div style="display:flex; gap:10px; padding-top:10px;">
+      <input type="text" id="commentInput" class="input-field" placeholder="Написать комментарий...">
+      <button class="action-btn" onclick="submitComment()" style="width:46px; height:46px; border-radius:12px;"><svg class="icon"><use href="#icon-send"/></svg></button>
+    </div>
+  </div>
+
+  <!-- Upload Modal -->
   <div id="uploadModal" class="modal-bottom">
     <div style="display:flex; justify-content:space-between; align-items:center; padding-bottom:12px; border-bottom:1px solid var(--border-steel);">
       <h3 style="font-size:16px;">Публикация контента</h3>
@@ -165,22 +216,15 @@
     </div>
     <div style="overflow-y:auto; flex:1; padding-top:16px;">
       <div class="form-group"><label>Медиафайл (Видео или Фото)</label><input type="file" id="upFile" class="input-field" accept="video/*,image/*"></div>
-      
       <div class="form-group">
-        <label>Музыка из SoundCloud (Трек или ссылка)</label>
-        <select id="soundCloudSelect" class="input-field" onchange="checkCustomSound(this)">
-          <option value="Janina Terranova — Ambient Mix (SoundCloud)">🎧 Janina Terranova — Ambient Mix</option>
+        <label>Музыка из SoundCloud</label>
+        <select id="soundCloudSelect" class="input-field">
+          <option value="Janina Terranova — Ambient Mix">🎧 Janina Terranova — Ambient Mix</option>
           <option value="Phonk Drift — SoundCloud Edition">🔥 Phonk Drift — SoundCloud</option>
           <option value="Lofi Chill Beats — SC Radio">🌙 Lofi Chill Beats — SC Radio</option>
-          <option value="custom">✍️ Ввести название / ссылку вручную</option>
         </select>
       </div>
-      <div class="form-group" id="customSoundWrapper" style="display:none;">
-        <label>Название трека / Ссылка SoundCloud</label>
-        <input type="text" id="upCustomSound" class="input-field" placeholder="https://soundcloud.com/artist/track">
-      </div>
-
-      <div class="form-group"><label>Описание ролику</label><textarea id="upDesc" class="input-field" rows="3" placeholder="Расскажите о ролике..."></textarea></div>
+      <div class="form-group"><label>Описание</label><textarea id="upDesc" class="input-field" rows="3" placeholder="Расскажите о ролике..."></textarea></div>
       <button class="auth-submit-btn" onclick="submitPost()">Опубликовать</button>
     </div>
   </div>
@@ -189,20 +233,18 @@
     let currentUser = null;
     let registeredUsers = {};
     let customAvatar = null;
+    let currentPostId = null;
     const BAD_WORDS = ["бля", "блять", "хуй", "хуесос", "пидор", "пидр", "чмо", "ебать", "гандон", "порно", "18+"];
 
-    // IndexedDB для вечного сохранения постов
     function openDB() {
-      return new Promise((resolve, reject) => {
-        const req = indexedDB.open('XokDatabase', 2);
+      return new Promise((res, rej) => {
+        const req = indexedDB.open('XokDatabase', 3);
         req.onupgradeneeded = (e) => {
           const db = e.target.result;
-          if (!db.objectStoreNames.contains('posts')) {
-            db.createObjectStore('posts', { keyPath: 'id' });
-          }
+          if (!db.objectStoreNames.contains('posts')) db.createObjectStore('posts', { keyPath: 'id' });
         };
-        req.onsuccess = () => resolve(req.result);
-        req.onerror = () => reject(req.error);
+        req.onsuccess = () => res(req.result);
+        req.onerror = () => rej(req.error);
       });
     }
 
@@ -233,9 +275,10 @@
         displayName: 'Михаил',
         username: '@misha_dev',
         avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=misha',
-        music: 'Janina Terranova — Ambient Mix (SoundCloud)',
-        description: 'Тестируем интеграцию с SoundCloud в Xok! 🎵 #xok',
-        likes: 42
+        music: 'Janina Terranova — Ambient Mix',
+        description: 'Добро пожаловать в Xok! 🚀 #xok',
+        likes: 42,
+        comments: []
       }
     ];
 
@@ -254,9 +297,7 @@
         if (dbPosts && dbPosts.length > 0) {
           posts = dbPosts.sort((a, b) => b.id - a.id);
         }
-      } catch (err) {
-        console.error('DB Error:', err);
-      }
+      } catch (err) { console.error(err); }
 
       renderFeed();
     };
@@ -282,10 +323,6 @@
         r.onload = (ev) => { customAvatar = ev.target.result; document.getElementById('avatarPreview').src = customAvatar; };
         r.readAsDataURL(f);
       }
-    }
-
-    function checkCustomSound(sel) {
-      document.getElementById('customSoundWrapper').style.display = sel.value === 'custom' ? 'block' : 'none';
     }
 
     function checkSafety(t) {
@@ -351,9 +388,10 @@
           ${mediaHTML}
           <div class="overlay">
             <div class="user-info">
-              <img src="${p.avatar}" class="user-avatar-post">
+              <img src="${p.avatar}" class="user-avatar-post" onclick="openProfile('${p.username}')">
               <div>
-                <strong>${escape(p.displayName)}</strong> <span style="font-size:12px; opacity:0.6;">${escape(p.username)}</span>
+                <strong style="cursor:pointer;" onclick="openProfile('${p.username}')">${escape(p.displayName)}</strong> 
+                <span style="font-size:12px; opacity:0.6;">${escape(p.username)}</span>
                 <p style="font-size:13px; margin-top:4px;">${escape(p.description)}</p>
                 <div class="sound-badge">
                   <svg class="icon" style="width:14px; height:14px;"><use href="#icon-music"/></svg>
@@ -362,9 +400,16 @@
               </div>
             </div>
             <div class="side-bar">
-              <button class="action-btn" onclick="this.querySelector('span').innerText=++p.likes;">
+              <button class="action-btn" onclick="toggleLike(this, ${p.id})">
                 <svg class="icon"><use href="#icon-heart"/></svg>
                 <span>${p.likes}</span>
+              </button>
+              <button class="action-btn" onclick="openComments(${p.id})">
+                <svg class="icon"><use href="#icon-comment"/></svg>
+                <span>${p.comments ? p.comments.length : 0}</span>
+              </button>
+              <button class="action-btn" onclick="sharePost()">
+                <svg class="icon"><use href="#icon-share"/></svg>
               </button>
             </div>
           </div>
@@ -385,16 +430,99 @@
       document.querySelectorAll('video').forEach(v => obs.observe(v));
     }
 
+    function toggleLike(btn, id) {
+      const p = posts.find(x => x.id === id);
+      if (p) {
+        p.likes++;
+        btn.querySelector('span').innerText = p.likes;
+        savePostToDB(p);
+      }
+    }
+
+    function sharePost() {
+      navigator.clipboard.writeText(window.location.href);
+      toast('Ссылка скопирована в буфер обмена!');
+    }
+
+    // Profile Modal
+    function openProfile(username) {
+      const modal = document.getElementById('profileModal');
+      const userPosts = posts.filter(p => p.username === username);
+      const user = username === (currentUser ? currentUser.username : '') ? currentUser : { displayName: username, username: username, avatar: `https://api.dicebear.com/7.x/bottts/svg?seed=${username}` };
+
+      document.getElementById('profileAvatar').src = user ? user.avatar : `https://api.dicebear.com/7.x/bottts/svg?seed=${username}`;
+      document.getElementById('profileName').innerText = user ? user.displayName : username;
+      document.getElementById('profileUserTag').innerText = username;
+
+      const grid = document.getElementById('profileGrid');
+      grid.innerHTML = '';
+      userPosts.forEach(p => {
+        const isVid = p.src.startsWith('data:video') || p.src.endsWith('.mp4') || p.src.includes('mixkit');
+        grid.innerHTML += `<div class="profile-grid-item">${isVid ? `<video src="${p.src}"></video>` : `<img src="${p.src}">`}</div>`;
+      });
+
+      modal.classList.add('active');
+    }
+    function closeProfile() { document.getElementById('profileModal').classList.remove('active'); }
+
+    // Comments Modal
+    function openComments(postId) {
+      currentPostId = postId;
+      const modal = document.getElementById('commentsModal');
+      renderCommentsList();
+      modal.classList.add('active');
+    }
+    function closeComments() { document.getElementById('commentsModal').classList.remove('active'); }
+
+    function renderCommentsList() {
+      const p = posts.find(x => x.id === currentPostId);
+      const list = document.getElementById('commentsList');
+      list.innerHTML = '';
+      if (!p || !p.comments || p.comments.length === 0) {
+        list.innerHTML = `<div style="color:var(--text-muted); text-align:center; padding:20px;">Нет комментариев</div>`;
+        return;
+      }
+      p.comments.forEach(c => {
+        list.innerHTML += `
+          <div class="comment-item">
+            <img src="${c.avatar}" class="comment-avatar">
+            <div>
+              <strong style="font-size:12px; color:var(--accent-cyan);">${escape(c.displayName)}</strong>
+              <p style="font-size:13px; margin-top:2px;">${escape(c.text)}</p>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    async function submitComment() {
+      const input = document.getElementById('commentInput');
+      const text = input.value.trim();
+      if (!text) return;
+      if (!checkSafety(text)) return toast('Запрещенный контент!');
+
+      const p = posts.find(x => x.id === currentPostId);
+      if (p) {
+        if (!p.comments) p.comments = [];
+        p.comments.push({
+          displayName: currentUser ? currentUser.displayName : 'Гость',
+          avatar: currentUser ? currentUser.avatar : 'https://api.dicebear.com/7.x/bottts/svg?seed=guest',
+          text: text
+        });
+        await savePostToDB(p);
+        input.value = '';
+        renderCommentsList();
+        renderFeed();
+      }
+    }
+
     function openUpload() { document.getElementById('uploadModal').classList.add('active'); }
     function closeUpload() { document.getElementById('uploadModal').classList.remove('active'); }
 
     async function submitPost() {
       const f = document.getElementById('upFile').files[0];
       const d = document.getElementById('upDesc').value.trim();
-      let music = document.getElementById('soundCloudSelect').value;
-      if (music === 'custom') {
-        music = document.getElementById('upCustomSound').value.trim() || 'SoundCloud Custom Track';
-      }
+      const music = document.getElementById('soundCloudSelect').value;
 
       if (!f) return toast('Выберите медиафайл!');
       if (!checkSafety(d)) return toast('Запрещенный контент!');
@@ -411,7 +539,8 @@
           avatar: currentUser ? currentUser.avatar : 'https://api.dicebear.com/7.x/bottts/svg?seed=guest',
           music: music,
           description: d,
-          likes: 0
+          likes: 0,
+          comments: []
         };
 
         try {
