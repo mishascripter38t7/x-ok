@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Xok — Shorts, Photos & Streams</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="xok-container" id="feed">
+    
+    <!-- Карточка 1: Видео -->
+    <div class="xok-card video-card">
+      <video loop playsinline muted src="https://assets.mixkit.co/videos/preview/mixkit-tree-branches-in-the-breeze-1187-large.mp4"></video>
+      <div class="overlay">
+        <div class="user-info">
+          <h3>@alex_dev</h3>
+          <p>Тестируем новый плеер в Xok! 🚀 #xok #dev</p>
+        </div>
+        <div class="side-bar">
+          <button class="action-btn">❤️ <span>12.4K</span></button>
+          <button class="action-btn">💬 <span>342</span></button>
+          <button class="action-btn">↪️ <span>Поделиться</span></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Карточка 2: Фото-пост -->
+    <div class="xok-card photo-card">
+      <img src="https://picsum.photos/800/1400?random=1" alt="Photo Post">
+      <div class="overlay">
+        <div class="user-info">
+          <h3>@photo_master</h3>
+          <p>Вечерние вайбы 🌆 Подписывайтесь на Xok!</p>
+        </div>
+        <div class="side-bar">
+          <button class="action-btn">❤️ <span>8.9K</span></button>
+          <button class="action-btn">💬 <span>115</span></button>
+          <button class="action-btn">↪️ <span>Поделиться</span></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Карточка 3: Прямой эфир (STREAM) -->
+    <div class="xok-card stream-card">
+      <div class="live-badge">🔴 LIVE</div>
+      <video loop playsinline muted src="https://assets.mixkit.co/videos/preview/mixkit-hands-holding-a-smartphone-40748-large.mp4"></video>
+      <div class="overlay">
+        <div class="user-info">
+          <h3>@gamer_pro</h3>
+          <p>Прямой эфир: Разбираем фичи Xok!</p>
+        </div>
+        <div class="side-bar">
+          <button class="action-btn">🎁 <span>Донат</span></button>
+          <button class="action-btn">❤️ <span>45.1K</span></button>
+          <button class="action-btn">💬 <span>1.2K</span></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Карточка 4: Реклама -->
+    <div class="xok-card ad-card">
+      <div class="ad-badge">Реклама</div>
+      <img src="https://picsum.photos/800/1400?random=2" alt="Ad Post">
+      <div class="overlay">
+        <div class="user-info">
+          <h3>@xok_official</h3>
+          <p>Создавай свои стримы и видео прямо сейчас!</p>
+          <a href="#" class="ad-cta">Узнать больше</a>
+        </div>
+        <div class="side-bar">
+          <button class="action-btn">❤️ <span>5.5K</span></button>
+          <button class="action-btn">↪️ <span>Поделиться</span></button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
