@@ -1,380 +1,51 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Xok — Shorts, Photos & Streams</title>
-  <style>
-    :root {
-      --bg-dark: #0a0c10;
-      --card-bg: rgba(18, 22, 31, 0.85);
-      --border-steel: rgba(255, 255, 255, 0.12);
-      --accent-cyan: #00f2fe;
-      --accent-pink: #ff0050;
-      --text-main: #f0f4f8;
-      --text-muted: #8a99ad;
-      --metal-gradient: linear-gradient(135deg, #1c2333 0%, #0d1117 50%, #161b22 100%);
-      --glow-cyan: 0 0 15px rgba(0, 242, 254, 0.35);
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      user-select: none;
-    }
-
-    body, html {
-      width: 100%;
-      height: 100%;
-      background: var(--bg-dark);
-      color: var(--text-main);
-      overflow: hidden;
-    }
-
-    .icon {
-      width: 22px;
-      height: 22px;
-      fill: currentColor;
-    }
-
-    /* Auth Overlay */
-    .auth-overlay {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(5, 7, 10, 0.95);
-      backdrop-filter: blur(20px);
-      z-index: 1000;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-    }
-
-    .auth-card {
-      width: 100%;
-      max-width: 400px;
-      background: var(--metal-gradient);
-      border: 1px solid var(--border-steel);
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), var(--glow-cyan);
-      border-radius: 20px;
-      padding: 24px;
-    }
-
-    .auth-tabs {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 18px;
-      border-bottom: 1px solid var(--border-steel);
-      padding-bottom: 10px;
-    }
-
-    .auth-tab-btn {
-      flex: 1;
-      background: none;
-      border: none;
-      color: var(--text-muted);
-      font-weight: 700;
-      font-size: 14px;
-      padding: 8px;
-      cursor: pointer;
-    }
-
-    .auth-tab-btn.active {
-      color: var(--accent-cyan);
-      border-bottom: 2px solid var(--accent-cyan);
-    }
-
-    .avatar-preview-wrapper {
-      width: 70px;
-      height: 70px;
-      margin: 0 auto 14px auto;
-      border-radius: 50%;
-      border: 2px solid var(--accent-cyan);
-      overflow: hidden;
-      cursor: pointer;
-    }
-
-    .avatar-preview-img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .form-group {
-      margin-bottom: 12px;
-    }
-
-    .form-group label {
-      display: block;
-      font-size: 11px;
-      color: var(--text-muted);
-      margin-bottom: 4px;
-      text-transform: uppercase;
-    }
-
-    .input-field {
-      width: 100%;
-      background: rgba(0, 0, 0, 0.5);
-      border: 1px solid var(--border-steel);
-      border-radius: 10px;
-      padding: 10px 12px;
-      color: #fff;
-      font-size: 14px;
-      outline: none;
-    }
-
-    .auth-submit-btn {
-      width: 100%;
-      margin-top: 10px;
-      background: linear-gradient(90deg, #00f2fe, #4facfe);
-      border: none;
-      color: #000;
-      font-weight: 700;
-      padding: 12px;
-      border-radius: 10px;
-      cursor: pointer;
-    }
-
-    /* Header */
-    .xok-header {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      height: 60px;
-      padding: 0 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      z-index: 100;
-      background: linear-gradient(to bottom, rgba(10, 12, 16, 0.9), transparent);
-      backdrop-filter: blur(10px);
-    }
-
-    .feed-nav {
-      display: flex;
-      gap: 12px;
-    }
-
-    .nav-tab {
-      background: none;
-      border: none;
-      color: var(--text-muted);
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      padding: 6px 12px;
-      border-radius: 20px;
-    }
-
-    .nav-tab.active {
-      color: #fff;
-      background: rgba(255, 255, 255, 0.1);
-      border: 1px solid var(--border-steel);
-    }
-
-    .btn-create {
-      background: linear-gradient(90deg, var(--accent-cyan), #00c6ff);
-      color: #000;
-      border: none;
-      font-weight: 700;
-      padding: 8px 14px;
-      border-radius: 20px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 13px;
-    }
-
-    .user-profile-badge {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      border: 1px solid var(--accent-cyan);
-      object-fit: cover;
-      cursor: pointer;
-    }
-
-    /* Feed & Container */
-    .xok-container {
-      width: 100vw;
-      height: 100vh;
-      overflow-y: mandatory;
-      scroll-snap-type: y mandatory;
-    }
-
-    .xok-card {
-      position: relative;
-      width: 100vw;
-      height: 100vh;
-      scroll-snap-align: start;
-      scroll-snap-stop: always;
-      background: #000;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .xok-card video {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .overlay {
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      padding: 20px;
-      background: linear-gradient(transparent, rgba(10, 12, 16, 0.95));
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-end;
-      z-index: 20;
-    }
-
-    .user-info {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      max-width: 75%;
-    }
-
-    .user-avatar-post {
-      width: 44px !important;
-      height: 44px !important;
-      min-width: 44px !important;
-      border-radius: 50% !important;
-      object-fit: cover !important;
-      border: 2px solid var(--accent-cyan) !important;
-    }
-
-    .side-bar {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      align-items: center;
-    }
-
-    .action-btn {
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid var(--border-steel);
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      color: #fff;
-      cursor: pointer;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-    }
-
-    /* Modal Bottom */
-    .modal-bottom {
-      position: fixed;
-      bottom: -100%; left: 0; right: 0;
-      height: 75vh;
-      background: var(--metal-gradient);
-      border-top: 1px solid var(--border-steel);
-      border-radius: 20px 20px 0 0;
-      z-index: 200;
-      transition: bottom 0.3s ease-in-out;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .modal-bottom.active {
-      bottom: 0;
-    }
-
-    .error-toast {
-      position: fixed;
-      top: 75px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(255, 0, 80, 0.9);
-      color: #fff;
-      padding: 8px 18px;
-      border-radius: 30px;
-      font-size: 12px;
-      font-weight: 600;
-      z-index: 1000;
-      display: none;
-    }
-  </style>
-</head>
-<body>
-
-  <!-- SVG Иконки -->
-  <svg style="display: none;">
-    <symbol id="icon-heart" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></symbol>
-    <symbol id="icon-plus" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></symbol>
-    <symbol id="icon-close" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></symbol>
-  </svg>
-
-  <div id="errorToast" class="error-toast"></div>
-
-  <!-- Окно авторизации -->
-  <div id="authModal" class="auth-overlay">
-    <div class="auth-card">
-      <div class="auth-tabs">
-        <button class="auth-tab-btn active" id="tabReg" onclick="switchAuth('reg')">Регистрация</button>
-        <button class="auth-tab-btn" id="tabLog" onclick="switchAuth('log')">Вход</button>
-      </div>
-
-      <div id="regForm">
-        <div class="avatar-preview-wrapper" onclick="document.getElementById('avatarFile').click()">
-          <img id="avatarPreview" class="avatar-preview-img" src="https://api.dicebear.com/7.x/bottts/svg?seed=Xok" alt="Avatar">
-        </div>
-        <input type="file" id="avatarFile" accept="image/*" style="display:none;" onchange="handleAvatar(event)">
-        <div class="form-group"><label>Отображаемое имя (Ник)</label><input type="text" id="regDN" class="input-field" placeholder="Миша"></div>
-        <div class="form-group"><label>Уникальный @username</label><input type="text" id="regUN" class="input-field" placeholder="misha_dev"></div>
-        <div class="form-group"><label>Пароль</label><input type="password" id="regPW" class="input-field" placeholder="••••••••"></div>
-        <button class="auth-submit-btn" onclick="submitReg()">Зарегистрироваться в Xok</button>
-      </div>
-
-      <div id="logForm" style="display:none;">
-        <div class="form-group"><label>@username</label><input type="text" id="logUN" class="input-field" placeholder="@misha_dev"></div>
-        <div class="form-group"><label>Пароль</label><input type="password" id="logPW" class="input-field" placeholder="••••••••"></div>
-        <button class="auth-submit-btn" onclick="submitLog()">Войти в Xok</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Шапка -->
-  <header class="xok-header">
-    <div class="feed-nav">
-      <button class="nav-tab active">Для вас</button>
-    </div>
-    <div style="display:flex; align-items:center; gap:10px;">
-      <button class="btn-create" onclick="openUpload()"><svg class="icon" style="fill:#000; width:16px; height:16px;"><use href="#icon-plus"/></svg> Создать</button>
-      <img id="headerAvatar" class="user-profile-badge" src="https://api.dicebear.com/7.x/bottts/svg?seed=Xok" alt="Profile" onclick="logout()">
-    </div>
-  </header>
-
-  <!-- Лента -->
-  <div class="xok-container" id="feed"></div>
-
-  <!-- Публикация -->
+<!-- Модальное окно загрузки -->
   <div id="uploadModal" class="modal-bottom" style="height:70vh;">
-    <div style="display:flex; justify-content:space-between; align-items:center; padding-bottom:10px;">
-      <h3>Публикация контента</h3>
-      <button onclick="closeUpload()" style="background:none; border:none; color:#fff; cursor:pointer;"><svg class="icon"><use href="#icon-close"/></svg></button>
-    </div>
-    <div style="overflow-y:auto; flex:1;">
-      <div class="form-group"><label>Медиафайл</label><input type="file" id="upFile" class="input-field" accept="video/*,image/*"></div>
-      <div class="form-group"><label>Описание</label><textarea id="upDesc" class="input-field" rows="3" placeholder="Расскажите о ролике..."></textarea></div>
-      <button class="auth-submit-btn" onclick="submitPost()">Опубликовать</button>
-    </div>
+    ...
   </div>
 
+  <!-- ВОТ СЮДА ВСТАВЛЯЕМ СКРИПТ (ПЕРЕД </body>) -->
   <script>
     let currentUser = null;
     let registeredUsers = {};
     let customAvatar = null;
     const BAD_WORDS = ["бля", "блять", "хуй", "хуесос", "пидор", "пидр", "чмо", "ебать", "гандон", "порно", "18+"];
+
+    // === МОДУЛЬ ХРАНЕНИЯ В INDEXEDDB ===
+    function openDB() {
+      return new Promise((resolve, reject) => {
+        const request = indexedDB.open('XokDatabase', 1);
+        request.onupgradeneeded = (e) => {
+          const db = e.target.result;
+          if (!db.objectStoreNames.contains('posts')) {
+            db.createObjectStore('posts', { keyPath: 'id' });
+          }
+        };
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      });
+    }
+
+    async function savePostToDB(post) {
+      const db = await openDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction('posts', 'readwrite');
+        const store = tx.objectStore('posts');
+        store.put(post);
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(tx.error);
+      });
+    }
+
+    async function loadPostsFromDB() {
+      const db = await openDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction('posts', 'readonly');
+        const store = tx.objectStore('posts');
+        const request = store.getAll();
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      });
+    }
 
     let posts = [
       {
@@ -388,7 +59,7 @@
       }
     ];
 
-    window.onload = () => {
+    window.onload = async () => {
       const u = localStorage.getItem('xok_users');
       if (u) registeredUsers = JSON.parse(u);
       const c = localStorage.getItem('xok_cur');
@@ -397,6 +68,16 @@
         document.getElementById('authModal').style.display = 'none';
         document.getElementById('headerAvatar').src = currentUser.avatar;
       }
+      
+      try {
+        const dbPosts = await loadPostsFromDB();
+        if (dbPosts && dbPosts.length > 0) {
+          posts = dbPosts.sort((a, b) => b.id - a.id);
+        }
+      } catch (err) {
+        console.error('Ошибка загрузки из IndexedDB:', err);
+      }
+      
       renderFeed();
     };
 
@@ -476,8 +157,14 @@
       posts.forEach(p => {
         const card = document.createElement('div');
         card.className = 'xok-card';
+        
+        const isVideo = p.src.startsWith('data:video') || p.src.endsWith('.mp4');
+        const mediaHTML = isVideo 
+          ? `<video loop playsinline muted src="${p.src}" onclick="if(this.paused)this.play();else this.pause();"></video>`
+          : `<img src="${p.src}" style="width:100%; height:100%; object-fit:cover;">`;
+
         card.innerHTML = `
-          <video loop playsinline muted src="${p.src}" onclick="if(this.paused)this.play();else this.pause();"></video>
+          ${mediaHTML}
           <div class="overlay">
             <div class="user-info">
               <img src="${p.avatar}" class="user-avatar-post">
@@ -501,7 +188,11 @@
 
     function setupObserver() {
       const obs = new IntersectionObserver((entries) => {
-        entries.forEach(e => { if (e.isIntersecting) e.target.play().catch(()=>{}); else e.target.pause(); });
+        entries.forEach(e => { 
+          if (e.target.tagName === 'VIDEO') {
+            if (e.isIntersecting) e.target.play().catch(()=>{}); else e.target.pause(); 
+          }
+        });
       }, { threshold: 0.6 });
       document.querySelectorAll('video').forEach(v => obs.observe(v));
     }
@@ -509,23 +200,39 @@
     function openUpload() { document.getElementById('uploadModal').classList.add('active'); }
     function closeUpload() { document.getElementById('uploadModal').classList.remove('active'); }
 
-    function submitPost() {
+    async function submitPost() {
       const f = document.getElementById('upFile').files[0];
       const d = document.getElementById('upDesc').value.trim();
       if (!f) return toast('Выберите медиафайл!');
       if (!checkSafety(d)) return toast('Запрещенный контент!');
 
-      posts.unshift({
-        id: Date.now(),
-        src: URL.createObjectURL(f),
-        displayName: currentUser ? currentUser.displayName : 'Гость',
-        username: currentUser ? currentUser.username : '@guest',
-        avatar: currentUser ? currentUser.avatar : 'https://api.dicebear.com/7.x/bottts/svg?seed=guest',
-        description: d,
-        likes: 0
-      });
-      closeUpload();
-      renderFeed();
+      toast('Загрузка и сохранение...');
+
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const newPost = {
+          id: Date.now(),
+          src: e.target.result,
+          displayName: currentUser ? currentUser.displayName : 'Гость',
+          username: currentUser ? currentUser.username : '@guest',
+          avatar: currentUser ? currentUser.avatar : 'https://api.dicebear.com/7.x/bottts/svg?seed=guest',
+          description: d,
+          likes: 0
+        };
+
+        try {
+          await savePostToDB(newPost);
+          posts.unshift(newPost);
+          closeUpload();
+          renderFeed();
+          toast('Опубликовано и сохранено!');
+        } catch (err) {
+          console.error(err);
+          toast('Ошибка сохранения файла!');
+        }
+      };
+
+      reader.readAsDataURL(f);
     }
 
     function escape(s) { return s.replace(/[&<>'"]/g, t => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[t] || t)); }
