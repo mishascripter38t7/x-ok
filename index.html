@@ -18,336 +18,67 @@
       --glow-pink: 0 0 20px rgba(255, 0, 80, 0.4);
     }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      user-select: none;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; user-select: none; }
+    body, html { width: 100%; height: 100%; background: var(--bg-dark); color: var(--text-main); overflow: hidden; }
 
-    body, html {
-      width: 100%;
-      height: 100%;
-      background: var(--bg-dark);
-      color: var(--text-main);
-      overflow: hidden;
-    }
+    .icon { width: 22px; height: 22px; fill: currentColor; }
 
-    .icon {
-      width: 22px;
-      height: 22px;
-      fill: currentColor;
-    }
-
-    /* Auth Overlay Modal */
     .auth-overlay {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(4, 6, 10, 0.92);
-      backdrop-filter: blur(25px);
-      z-index: 1000;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(4, 6, 10, 0.92); backdrop-filter: blur(25px);
+      z-index: 1000; display: flex; justify-content: center; align-items: center; padding: 20px;
     }
 
     .auth-card {
-      width: 100%;
-      max-width: 400px;
-      background: var(--metal-gradient);
-      border: 1px solid var(--border-steel);
-      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9), var(--glow-cyan);
-      border-radius: 24px;
-      padding: 28px;
-      position: relative;
+      width: 100%; max-width: 400px; background: var(--metal-gradient);
+      border: 1px solid var(--border-steel); box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9), var(--glow-cyan);
+      border-radius: 24px; padding: 28px; position: relative;
     }
 
-    .auth-tabs {
-      display: flex;
-      gap: 12px;
-      margin-bottom: 20px;
-      border-bottom: 1px solid var(--border-steel);
-      padding-bottom: 12px;
-    }
+    .auth-tabs { display: flex; gap: 12px; margin-bottom: 20px; border-bottom: 1px solid var(--border-steel); padding-bottom: 12px; }
+    .auth-tab-btn { flex: 1; background: none; border: none; color: var(--text-muted); font-weight: 700; font-size: 14px; padding: 8px; cursor: pointer; transition: all 0.3s; }
+    .auth-tab-btn.active { color: var(--accent-cyan); border-bottom: 2px solid var(--accent-cyan); text-shadow: 0 0 10px rgba(0, 242, 254, 0.5); }
 
-    .auth-tab-btn {
-      flex: 1;
-      background: none;
-      border: none;
-      color: var(--text-muted);
-      font-weight: 700;
-      font-size: 14px;
-      padding: 8px;
-      cursor: pointer;
-      transition: all 0.3s;
-    }
+    .avatar-preview-wrapper { width: 76px; height: 76px; margin: 0 auto 16px auto; border-radius: 50%; border: 2px solid var(--accent-cyan); box-shadow: var(--glow-cyan); overflow: hidden; cursor: pointer; position: relative; }
+    .avatar-preview-img { width: 100%; height: 100%; object-fit: cover; }
 
-    .auth-tab-btn.active {
-      color: var(--accent-cyan);
-      border-bottom: 2px solid var(--accent-cyan);
-      text-shadow: 0 0 10px rgba(0, 242, 254, 0.5);
-    }
+    .form-group { margin-bottom: 14px; }
+    .form-group label { display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .input-field { width: 100%; background: rgba(0, 0, 0, 0.6); border: 1px solid var(--border-steel); border-radius: 12px; padding: 12px 14px; color: #fff; font-size: 14px; outline: none; transition: border 0.3s; }
+    .input-field:focus { border-color: var(--accent-cyan); box-shadow: 0 0 10px rgba(0, 242, 254, 0.2); }
 
-    .avatar-preview-wrapper {
-      width: 76px;
-      height: 76px;
-      margin: 0 auto 16px auto;
-      border-radius: 50%;
-      border: 2px solid var(--accent-cyan);
-      box-shadow: var(--glow-cyan);
-      overflow: hidden;
-      cursor: pointer;
-      position: relative;
-    }
+    .auth-submit-btn { width: 100%; margin-top: 10px; background: linear-gradient(90deg, #00f2fe, #4facfe); border: none; color: #000; font-weight: 800; padding: 14px; border-radius: 12px; cursor: pointer; font-size: 14px; transition: transform 0.2s, box-shadow 0.2s; }
+    .auth-submit-btn:hover { transform: translateY(-2px); box-shadow: var(--glow-cyan); }
 
-    .avatar-preview-img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
+    .xok-header { position: fixed; top: 0; left: 0; right: 0; height: 64px; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; z-index: 100; background: linear-gradient(to bottom, rgba(7, 9, 14, 0.9), transparent); backdrop-filter: blur(12px); }
+    .feed-nav { display: flex; gap: 12px; }
+    .nav-tab { background: none; border: none; color: var(--text-muted); font-size: 14px; font-weight: 700; cursor: pointer; padding: 8px 16px; border-radius: 20px; transition: all 0.3s; }
+    .nav-tab.active { color: #fff; background: rgba(255, 255, 255, 0.12); border: 1px solid var(--border-steel); backdrop-filter: blur(10px); }
 
-    .form-group {
-      margin-bottom: 14px;
-    }
+    .btn-create { background: linear-gradient(90deg, var(--accent-cyan), #00c6ff); color: #000; border: none; font-weight: 800; padding: 8px 16px; border-radius: 20px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 13px; box-shadow: var(--glow-cyan); }
+    .user-profile-badge { width: 38px; height: 38px; border-radius: 50%; border: 2px solid var(--accent-cyan); object-fit: cover; cursor: pointer; }
 
-    .form-group label {
-      display: block;
-      font-size: 11px;
-      color: var(--text-muted);
-      margin-bottom: 6px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
+    .xok-container { width: 100vw; height: 100vh; overflow-y: mandatory; scroll-snap-type: y mandatory; }
+    .xok-card { position: relative; width: 100vw; height: 100vh; scroll-snap-align: start; scroll-snap-stop: always; background: #000; display: flex; justify-content: center; align-items: center; }
+    .xok-card video, .xok-card img.media-content { width: 100%; height: 100%; object-fit: cover; }
 
-    .input-field {
-      width: 100%;
-      background: rgba(0, 0, 0, 0.6);
-      border: 1px solid var(--border-steel);
-      border-radius: 12px;
-      padding: 12px 14px;
-      color: #fff;
-      font-size: 14px;
-      outline: none;
-      transition: border 0.3s;
-    }
+    .overlay { position: absolute; bottom: 0; left: 0; right: 0; padding: 24px 20px; background: linear-gradient(transparent, rgba(7, 9, 14, 0.95)); display: flex; justify-content: space-between; align-items: flex-end; z-index: 20; }
+    .user-info { display: flex; align-items: center; gap: 12px; max-width: 75%; }
+    .user-avatar-post { width: 44px !important; height: 44px !important; min-width: 44px !important; border-radius: 50% !important; object-fit: cover !important; border: 2px solid var(--accent-cyan) !important; box-shadow: var(--glow-cyan); }
 
-    .input-field:focus {
-      border-color: var(--accent-cyan);
-      box-shadow: 0 0 10px rgba(0, 242, 254, 0.2);
-    }
+    .side-bar { display: flex; flex-direction: column; gap: 16px; align-items: center; }
+    .action-btn { background: rgba(255, 255, 255, 0.1); border: 1px solid var(--border-steel); width: 46px; height: 46px; border-radius: 50%; color: #fff; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(12px); transition: all 0.2s; }
+    .action-btn:hover { transform: scale(1.1); border-color: var(--accent-cyan); box-shadow: var(--glow-cyan); }
+    .action-btn span { font-size: 10px; margin-top: 2px; color: var(--text-muted); }
 
-    .auth-submit-btn {
-      width: 100%;
-      margin-top: 10px;
-      background: linear-gradient(90deg, #00f2fe, #4facfe);
-      border: none;
-      color: #000;
-      font-weight: 800;
-      padding: 14px;
-      border-radius: 12px;
-      cursor: pointer;
-      font-size: 14px;
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
+    .modal-bottom { position: fixed; bottom: -100%; left: 0; right: 0; height: 75vh; background: var(--metal-gradient); border-top: 1px solid var(--border-steel); border-radius: 24px 24px 0 0; z-index: 200; transition: bottom 0.3s ease-in-out; padding: 20px; display: flex; flex-direction: column; box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.8); }
+    .modal-bottom.active { bottom: 0; }
 
-    .auth-submit-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--glow-cyan);
-    }
-
-    /* Top Glass Header */
-    .xok-header {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      height: 64px;
-      padding: 0 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      z-index: 100;
-      background: linear-gradient(to bottom, rgba(7, 9, 14, 0.9), transparent);
-      backdrop-filter: blur(12px);
-    }
-
-    .feed-nav {
-      display: flex;
-      gap: 12px;
-    }
-
-    .nav-tab {
-      background: none;
-      border: none;
-      color: var(--text-muted);
-      font-size: 14px;
-      font-weight: 700;
-      cursor: pointer;
-      padding: 8px 16px;
-      border-radius: 20px;
-      transition: all 0.3s;
-    }
-
-    .nav-tab.active {
-      color: #fff;
-      background: rgba(255, 255, 255, 0.12);
-      border: 1px solid var(--border-steel);
-      backdrop-filter: blur(10px);
-    }
-
-    .btn-create {
-      background: linear-gradient(90deg, var(--accent-cyan), #00c6ff);
-      color: #000;
-      border: none;
-      font-weight: 800;
-      padding: 8px 16px;
-      border-radius: 20px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 13px;
-      box-shadow: var(--glow-cyan);
-    }
-
-    .user-profile-badge {
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
-      border: 2px solid var(--accent-cyan);
-      object-fit: cover;
-      cursor: pointer;
-    }
-
-    /* Main Feed */
-    .xok-container {
-      width: 100vw;
-      height: 100vh;
-      overflow-y: mandatory;
-      scroll-snap-type: y mandatory;
-    }
-
-    .xok-card {
-      position: relative;
-      width: 100vw;
-      height: 100vh;
-      scroll-snap-align: start;
-      scroll-snap-stop: always;
-      background: #000;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .xok-card video, .xok-card img.media-content {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .overlay {
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      padding: 24px 20px;
-      background: linear-gradient(transparent, rgba(7, 9, 14, 0.95));
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-end;
-      z-index: 20;
-    }
-
-    .user-info {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      max-width: 75%;
-    }
-
-    .user-avatar-post {
-      width: 44px !important;
-      height: 44px !important;
-      min-width: 44px !important;
-      border-radius: 50% !important;
-      object-fit: cover !important;
-      border: 2px solid var(--accent-cyan) !important;
-      box-shadow: var(--glow-cyan);
-    }
-
-    .side-bar {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      align-items: center;
-    }
-
-    .action-btn {
-      background: rgba(255, 255, 255, 0.1);
-      border: 1px solid var(--border-steel);
-      width: 46px;
-      height: 46px;
-      border-radius: 50%;
-      color: #fff;
-      cursor: pointer;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      backdrop-filter: blur(12px);
-      transition: all 0.2s;
-    }
-
-    .action-btn:hover {
-      transform: scale(1.1);
-      border-color: var(--accent-cyan);
-      box-shadow: var(--glow-cyan);
-    }
-
-    .action-btn span {
-      font-size: 10px;
-      margin-top: 2px;
-      color: var(--text-muted);
-    }
-
-    /* Modal Bottom */
-    .modal-bottom {
-      position: fixed;
-      bottom: -100%; left: 0; right: 0;
-      height: 75vh;
-      background: var(--metal-gradient);
-      border-top: 1px solid var(--border-steel);
-      border-radius: 24px 24px 0 0;
-      z-index: 200;
-      transition: bottom 0.3s ease-in-out;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.8);
-    }
-
-    .modal-bottom.active {
-      bottom: 0;
-    }
-
-    .error-toast {
-      position: fixed;
-      top: 80px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(255, 0, 80, 0.95);
-      color: #fff;
-      padding: 10px 22px;
-      border-radius: 30px;
-      font-size: 13px;
-      font-weight: 700;
-      z-index: 1000;
-      display: none;
-      box-shadow: var(--glow-pink);
-    }
+    .error-toast { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); background: rgba(255, 0, 80, 0.95); color: #fff; padding: 10px 22px; border-radius: 30px; font-size: 13px; font-weight: 700; z-index: 1000; display: none; box-shadow: var(--glow-pink); }
   </style>
 </head>
 <body>
 
-  <!-- SVG Icons Sprite -->
   <svg style="display: none;">
     <symbol id="icon-heart" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></symbol>
     <symbol id="icon-plus" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></symbol>
@@ -356,7 +87,6 @@
 
   <div id="errorToast" class="error-toast"></div>
 
-  <!-- Auth Overlay -->
   <div id="authModal" class="auth-overlay">
     <div class="auth-card">
       <div class="auth-tabs">
@@ -383,7 +113,6 @@
     </div>
   </div>
 
-  <!-- Top Navigation Header -->
   <header class="xok-header">
     <div class="feed-nav">
       <button class="nav-tab active">Для вас</button>
@@ -397,10 +126,8 @@
     </div>
   </header>
 
-  <!-- Feed Container -->
   <div class="xok-container" id="feed"></div>
 
-  <!-- Upload Modal -->
   <div id="uploadModal" class="modal-bottom">
     <div style="display:flex; justify-content:space-between; align-items:center; padding-bottom:12px; border-bottom:1px solid var(--border-steel);">
       <h3 style="font-size:16px;">Публикация контента</h3>
@@ -419,7 +146,6 @@
     let customAvatar = null;
     const BAD_WORDS = ["бля", "блять", "хуй", "хуесос", "пидор", "пидр", "чмо", "ебать", "гандон", "порно", "18+"];
 
-    // IndexedDB Operations
     function openDB() {
       return new Promise((resolve, reject) => {
         const request = indexedDB.open('XokDatabase', 1);
