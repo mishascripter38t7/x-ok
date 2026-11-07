@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Xok — Shorts, Photos & Streams</title>
+  <title>Xok — Shorts & Photos</title>
   <style>
     :root {
       --bg-dark: #07090e;
@@ -23,70 +23,100 @@
 
     .icon { width: 22px; height: 22px; fill: currentColor; }
 
+    /* Auth Overlay */
     .auth-overlay {
       position: fixed; top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(4, 6, 10, 0.92); backdrop-filter: blur(25px);
       z-index: 1000; display: flex; justify-content: center; align-items: center; padding: 20px;
     }
-
     .auth-card {
       width: 100%; max-width: 400px; background: var(--metal-gradient);
       border: 1px solid var(--border-steel); box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9), var(--glow-cyan);
-      border-radius: 24px; padding: 28px; position: relative;
+      border-radius: 24px; padding: 28px;
     }
-
     .auth-tabs { display: flex; gap: 12px; margin-bottom: 20px; border-bottom: 1px solid var(--border-steel); padding-bottom: 12px; }
-    .auth-tab-btn { flex: 1; background: none; border: none; color: var(--text-muted); font-weight: 700; font-size: 14px; padding: 8px; cursor: pointer; transition: all 0.3s; }
+    .auth-tab-btn { flex: 1; background: none; border: none; color: var(--text-muted); font-weight: 700; font-size: 14px; padding: 8px; cursor: pointer; }
     .auth-tab-btn.active { color: var(--accent-cyan); border-bottom: 2px solid var(--accent-cyan); text-shadow: 0 0 10px rgba(0, 242, 254, 0.5); }
 
-    .avatar-preview-wrapper { width: 76px; height: 76px; margin: 0 auto 16px auto; border-radius: 50%; border: 2px solid var(--accent-cyan); box-shadow: var(--glow-cyan); overflow: hidden; cursor: pointer; position: relative; }
+    .avatar-preview-wrapper { width: 76px; height: 76px; margin: 0 auto 16px auto; border-radius: 50%; border: 2px solid var(--accent-cyan); box-shadow: var(--glow-cyan); overflow: hidden; cursor: pointer; }
     .avatar-preview-img { width: 100%; height: 100%; object-fit: cover; }
 
     .form-group { margin-bottom: 14px; }
-    .form-group label { display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
-    .input-field { width: 100%; background: rgba(0, 0, 0, 0.6); border: 1px solid var(--border-steel); border-radius: 12px; padding: 12px 14px; color: #fff; font-size: 14px; outline: none; transition: border 0.3s; }
+    .form-group label { display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; }
+    .input-field { width: 100%; background: rgba(0, 0, 0, 0.6); border: 1px solid var(--border-steel); border-radius: 12px; padding: 12px 14px; color: #fff; font-size: 14px; outline: none; }
     .input-field:focus { border-color: var(--accent-cyan); box-shadow: 0 0 10px rgba(0, 242, 254, 0.2); }
 
-    .auth-submit-btn { width: 100%; margin-top: 10px; background: linear-gradient(90deg, #00f2fe, #4facfe); border: none; color: #000; font-weight: 800; padding: 14px; border-radius: 12px; cursor: pointer; font-size: 14px; transition: transform 0.2s, box-shadow 0.2s; }
-    .auth-submit-btn:hover { transform: translateY(-2px); box-shadow: var(--glow-cyan); }
+    .auth-submit-btn { width: 100%; margin-top: 10px; background: linear-gradient(90deg, #00f2fe, #4facfe); border: none; color: #000; font-weight: 800; padding: 14px; border-radius: 12px; cursor: pointer; font-size: 14px; }
 
-    .xok-header { position: fixed; top: 0; left: 0; right: 0; height: 64px; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; z-index: 100; background: linear-gradient(to bottom, rgba(7, 9, 14, 0.9), transparent); backdrop-filter: blur(12px); }
-    .feed-nav { display: flex; gap: 12px; }
-    .nav-tab { background: none; border: none; color: var(--text-muted); font-size: 14px; font-weight: 700; cursor: pointer; padding: 8px 16px; border-radius: 20px; transition: all 0.3s; }
-    .nav-tab.active { color: #fff; background: rgba(255, 255, 255, 0.12); border: 1px solid var(--border-steel); backdrop-filter: blur(10px); }
-
+    /* Header */
+    .xok-header {
+      position: fixed; top: 0; left: 0; right: 0; height: 64px; padding: 0 20px;
+      display: flex; justify-content: space-between; align-items: center; z-index: 100;
+      background: linear-gradient(to bottom, rgba(7, 9, 14, 0.9), transparent); backdrop-filter: blur(12px);
+    }
     .btn-create { background: linear-gradient(90deg, var(--accent-cyan), #00c6ff); color: #000; border: none; font-weight: 800; padding: 8px 16px; border-radius: 20px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 13px; box-shadow: var(--glow-cyan); }
     .user-profile-badge { width: 38px; height: 38px; border-radius: 50%; border: 2px solid var(--accent-cyan); object-fit: cover; cursor: pointer; }
 
-    .xok-container { width: 100vw; height: 100vh; overflow-y: mandatory; scroll-snap-type: y mandatory; }
-    .xok-card { position: relative; width: 100vw; height: 100vh; scroll-snap-align: start; scroll-snap-stop: always; background: #000; display: flex; justify-content: center; align-items: center; }
+    /* Scrollable Feed Fix */
+    .xok-container {
+      width: 100vw; height: 100vh;
+      overflow-y: scroll;
+      scroll-snap-type: y mandatory;
+      -webkit-overflow-scrolling: touch;
+    }
+    .xok-card {
+      position: relative; width: 100vw; height: 100vh;
+      scroll-snap-align: start; scroll-snap-stop: always;
+      background: #000; display: flex; justify-content: center; align-items: center;
+    }
     .xok-card video, .xok-card img.media-content { width: 100%; height: 100%; object-fit: cover; }
 
-    .overlay { position: absolute; bottom: 0; left: 0; right: 0; padding: 24px 20px; background: linear-gradient(transparent, rgba(7, 9, 14, 0.95)); display: flex; justify-content: space-between; align-items: flex-end; z-index: 20; }
+    .overlay {
+      position: absolute; bottom: 0; left: 0; right: 0; padding: 24px 20px;
+      background: linear-gradient(transparent, rgba(7, 9, 14, 0.95));
+      display: flex; justify-content: space-between; align-items: flex-end; z-index: 20;
+    }
     .user-info { display: flex; align-items: center; gap: 12px; max-width: 75%; }
     .user-avatar-post { width: 44px !important; height: 44px !important; min-width: 44px !important; border-radius: 50% !important; object-fit: cover !important; border: 2px solid var(--accent-cyan) !important; box-shadow: var(--glow-cyan); }
 
+    .sound-badge { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--accent-cyan); margin-top: 6px; }
+
     .side-bar { display: flex; flex-direction: column; gap: 16px; align-items: center; }
-    .action-btn { background: rgba(255, 255, 255, 0.1); border: 1px solid var(--border-steel); width: 46px; height: 46px; border-radius: 50%; color: #fff; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(12px); transition: all 0.2s; }
-    .action-btn:hover { transform: scale(1.1); border-color: var(--accent-cyan); box-shadow: var(--glow-cyan); }
+    .action-btn {
+      background: rgba(255, 255, 255, 0.1); border: 1px solid var(--border-steel);
+      width: 46px; height: 46px; border-radius: 50%; color: #fff; cursor: pointer;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(12px);
+    }
     .action-btn span { font-size: 10px; margin-top: 2px; color: var(--text-muted); }
 
-    .modal-bottom { position: fixed; bottom: -100%; left: 0; right: 0; height: 75vh; background: var(--metal-gradient); border-top: 1px solid var(--border-steel); border-radius: 24px 24px 0 0; z-index: 200; transition: bottom 0.3s ease-in-out; padding: 20px; display: flex; flex-direction: column; box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.8); }
+    /* Modal Bottom */
+    .modal-bottom {
+      position: fixed; bottom: -100%; left: 0; right: 0; height: 75vh;
+      background: var(--metal-gradient); border-top: 1px solid var(--border-steel);
+      border-radius: 24px 24px 0 0; z-index: 200; transition: bottom 0.3s ease-in-out;
+      padding: 20px; display: flex; flex-direction: column; box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.8);
+    }
     .modal-bottom.active { bottom: 0; }
 
-    .error-toast { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); background: rgba(255, 0, 80, 0.95); color: #fff; padding: 10px 22px; border-radius: 30px; font-size: 13px; font-weight: 700; z-index: 1000; display: none; box-shadow: var(--glow-pink); }
+    .error-toast {
+      position: fixed; top: 80px; left: 50%; transform: translateX(-50%);
+      background: rgba(255, 0, 80, 0.95); color: #fff; padding: 10px 22px;
+      border-radius: 30px; font-size: 13px; font-weight: 700; z-index: 1000; display: none;
+    }
   </style>
 </head>
 <body>
 
   <svg style="display: none;">
     <symbol id="icon-heart" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></symbol>
+    <symbol id="icon-music" viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></symbol>
     <symbol id="icon-plus" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></symbol>
     <symbol id="icon-close" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></symbol>
   </svg>
 
   <div id="errorToast" class="error-toast"></div>
 
+  <!-- Auth Modal -->
   <div id="authModal" class="auth-overlay">
     <div class="auth-card">
       <div class="auth-tabs">
@@ -113,21 +143,21 @@
     </div>
   </div>
 
+  <!-- Header -->
   <header class="xok-header">
-    <div class="feed-nav">
-      <button class="nav-tab active">Для вас</button>
-    </div>
+    <div style="font-weight: 800; font-size: 18px; letter-spacing: 1px; color: var(--accent-cyan);">XOK</div>
     <div style="display:flex; align-items:center; gap:12px;">
       <button class="btn-create" onclick="openUpload()">
-        <svg class="icon" style="fill:#000; width:16px; height:16px;"><use href="#icon-plus"/></svg> 
-        Создать
+        <svg class="icon" style="fill:#000; width:16px; height:16px;"><use href="#icon-plus"/></svg> Создать
       </button>
       <img id="headerAvatar" class="user-profile-badge" src="https://api.dicebear.com/7.x/bottts/svg?seed=Xok" alt="Profile" onclick="logout()">
     </div>
   </header>
 
+  <!-- Feed -->
   <div class="xok-container" id="feed"></div>
 
+  <!-- Upload Modal with SoundCloud Integration -->
   <div id="uploadModal" class="modal-bottom">
     <div style="display:flex; justify-content:space-between; align-items:center; padding-bottom:12px; border-bottom:1px solid var(--border-steel);">
       <h3 style="font-size:16px;">Публикация контента</h3>
@@ -135,6 +165,21 @@
     </div>
     <div style="overflow-y:auto; flex:1; padding-top:16px;">
       <div class="form-group"><label>Медиафайл (Видео или Фото)</label><input type="file" id="upFile" class="input-field" accept="video/*,image/*"></div>
+      
+      <div class="form-group">
+        <label>Музыка из SoundCloud (Трек или ссылка)</label>
+        <select id="soundCloudSelect" class="input-field" onchange="checkCustomSound(this)">
+          <option value="Janina Terranova — Ambient Mix (SoundCloud)">🎧 Janina Terranova — Ambient Mix</option>
+          <option value="Phonk Drift — SoundCloud Edition">🔥 Phonk Drift — SoundCloud</option>
+          <option value="Lofi Chill Beats — SC Radio">🌙 Lofi Chill Beats — SC Radio</option>
+          <option value="custom">✍️ Ввести название / ссылку вручную</option>
+        </select>
+      </div>
+      <div class="form-group" id="customSoundWrapper" style="display:none;">
+        <label>Название трека / Ссылка SoundCloud</label>
+        <input type="text" id="upCustomSound" class="input-field" placeholder="https://soundcloud.com/artist/track">
+      </div>
+
       <div class="form-group"><label>Описание ролику</label><textarea id="upDesc" class="input-field" rows="3" placeholder="Расскажите о ролике..."></textarea></div>
       <button class="auth-submit-btn" onclick="submitPost()">Опубликовать</button>
     </div>
@@ -146,39 +191,38 @@
     let customAvatar = null;
     const BAD_WORDS = ["бля", "блять", "хуй", "хуесос", "пидор", "пидр", "чмо", "ебать", "гандон", "порно", "18+"];
 
+    // IndexedDB для вечного сохранения постов
     function openDB() {
       return new Promise((resolve, reject) => {
-        const request = indexedDB.open('XokDatabase', 1);
-        request.onupgradeneeded = (e) => {
+        const req = indexedDB.open('XokDatabase', 2);
+        req.onupgradeneeded = (e) => {
           const db = e.target.result;
           if (!db.objectStoreNames.contains('posts')) {
             db.createObjectStore('posts', { keyPath: 'id' });
           }
         };
-        request.onsuccess = () => resolve(request.result);
-        request.onerror = () => reject(request.error);
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
       });
     }
 
     async function savePostToDB(post) {
       const db = await openDB();
-      return new Promise((resolve, reject) => {
+      return new Promise((res, rej) => {
         const tx = db.transaction('posts', 'readwrite');
-        const store = tx.objectStore('posts');
-        store.put(post);
-        tx.oncomplete = () => resolve();
-        tx.onerror = () => reject(tx.error);
+        tx.objectStore('posts').put(post);
+        tx.oncomplete = () => res();
+        tx.onerror = () => rej(tx.error);
       });
     }
 
     async function loadPostsFromDB() {
       const db = await openDB();
-      return new Promise((resolve, reject) => {
+      return new Promise((res, rej) => {
         const tx = db.transaction('posts', 'readonly');
-        const store = tx.objectStore('posts');
-        const request = store.getAll();
-        request.onsuccess = () => resolve(request.result);
-        request.onerror = () => reject(request.error);
+        const req = tx.objectStore('posts').getAll();
+        req.onsuccess = () => res(req.result);
+        req.onerror = () => rej(req.error);
       });
     }
 
@@ -189,7 +233,8 @@
         displayName: 'Михаил',
         username: '@misha_dev',
         avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=misha',
-        description: 'Добро пожаловать в Xok! 🚀 #xok',
+        music: 'Janina Terranova — Ambient Mix (SoundCloud)',
+        description: 'Тестируем интеграцию с SoundCloud в Xok! 🎵 #xok',
         likes: 42
       }
     ];
@@ -210,7 +255,7 @@
           posts = dbPosts.sort((a, b) => b.id - a.id);
         }
       } catch (err) {
-        console.error('IndexedDB Error:', err);
+        console.error('DB Error:', err);
       }
 
       renderFeed();
@@ -237,6 +282,10 @@
         r.onload = (ev) => { customAvatar = ev.target.result; document.getElementById('avatarPreview').src = customAvatar; };
         r.readAsDataURL(f);
       }
+    }
+
+    function checkCustomSound(sel) {
+      document.getElementById('customSoundWrapper').style.display = sel.value === 'custom' ? 'block' : 'none';
     }
 
     function checkSafety(t) {
@@ -293,7 +342,7 @@
         const card = document.createElement('div');
         card.className = 'xok-card';
 
-        const isVideo = p.src.startsWith('data:video') || p.src.endsWith('.mp4');
+        const isVideo = p.src.startsWith('data:video') || p.src.endsWith('.mp4') || p.src.includes('mixkit');
         const mediaHTML = isVideo 
           ? `<video loop playsinline muted src="${p.src}" onclick="if(this.paused)this.play();else this.pause();"></video>`
           : `<img src="${p.src}" class="media-content">`;
@@ -306,6 +355,10 @@
               <div>
                 <strong>${escape(p.displayName)}</strong> <span style="font-size:12px; opacity:0.6;">${escape(p.username)}</span>
                 <p style="font-size:13px; margin-top:4px;">${escape(p.description)}</p>
+                <div class="sound-badge">
+                  <svg class="icon" style="width:14px; height:14px;"><use href="#icon-music"/></svg>
+                  <span>SoundCloud: ${escape(p.music || 'Original Track')}</span>
+                </div>
               </div>
             </div>
             <div class="side-bar">
@@ -338,10 +391,15 @@
     async function submitPost() {
       const f = document.getElementById('upFile').files[0];
       const d = document.getElementById('upDesc').value.trim();
+      let music = document.getElementById('soundCloudSelect').value;
+      if (music === 'custom') {
+        music = document.getElementById('upCustomSound').value.trim() || 'SoundCloud Custom Track';
+      }
+
       if (!f) return toast('Выберите медиафайл!');
       if (!checkSafety(d)) return toast('Запрещенный контент!');
 
-      toast('Сохранение...');
+      toast('Сохранение в базу...');
 
       const reader = new FileReader();
       reader.onload = async (e) => {
@@ -351,6 +409,7 @@
           displayName: currentUser ? currentUser.displayName : 'Гость',
           username: currentUser ? currentUser.username : '@guest',
           avatar: currentUser ? currentUser.avatar : 'https://api.dicebear.com/7.x/bottts/svg?seed=guest',
+          music: music,
           description: d,
           likes: 0
         };
@@ -360,10 +419,10 @@
           posts.unshift(newPost);
           closeUpload();
           renderFeed();
-          toast('Опубликовано!');
+          toast('Успешно опубликовано!');
         } catch (err) {
           console.error(err);
-          toast('Ошибка сохранения!');
+          toast('Ошибка сохранения файла!');
         }
       };
 
