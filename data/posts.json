@@ -1,0 +1,14 @@
+[
+  {
+    "id": 101,
+    "type": "video",
+    "src": "assets/videos/demo1.mp4",
+    "username": "@misha_dev",
+    "displayName": "Михаил",
+    "avatar": "assets/avatars/misha.svg",
+    "music": "Phonk Drift — Xok Audio",
+    "description": "Новый апдейт структуры Xok! 🔥 #xok",
+    "likes": 42,
+    "comments": []
+  }
+]
