@@ -4,920 +4,132 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Xok — Shorts, Photos & Streams</title>
-  <style>
-    :root {
-      --bg-dark: #0a0c10;
-      --card-bg: rgba(18, 22, 31, 0.75);
-      --border-steel: rgba(255, 255, 255, 0.12);
-      --accent-cyan: #00f2fe;
-      --accent-pink: #ff0050;
-      --text-main: #f0f4f8;
-      --text-muted: #8a99ad;
-      --metal-gradient: linear-gradient(135deg, #1c2333 0%, #0d1117 50%, #161b22 100%);
-      --glow-cyan: 0 0 15px rgba(0, 242, 254, 0.35);
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      user-select: none;
-    }
-
-    body, html {
-      width: 100%;
-      height: 100%;
-      background: var(--bg-dark);
-      color: var(--text-main);
-      overflow: hidden;
-    }
-
-    /* SVG Icons Sprite Helper */
-    .icon {
-      width: 24px;
-      height: 24px;
-      fill: currentColor;
-    }
-
-    /* Modal Authentication Layer */
-    .auth-overlay {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: radial-gradient(circle at center, rgba(13, 17, 23, 0.95), rgba(5, 7, 10, 0.98));
-      backdrop-filter: blur(20px);
-      z-index: 1000;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-    }
-
-    .auth-card {
-      width: 100%;
-      max-width: 420px;
-      background: var(--metal-gradient);
-      border: 1px solid var(--border-steel);
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), var(--glow-cyan);
-      border-radius: 20px;
-      padding: 28px;
-      position: relative;
-    }
-
-    .auth-tabs {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
-      border-bottom: 1px solid var(--border-steel);
-      padding-bottom: 10px;
-    }
-
-    .auth-tab-btn {
-      flex: 1;
-      background: none;
-      border: none;
-      color: var(--text-muted);
-      font-weight: 600;
-      font-size: 15px;
-      padding: 8px;
-      cursor: pointer;
-      transition: all 0.3s;
-    }
-
-    .auth-tab-btn.active {
-      color: var(--accent-cyan);
-      border-bottom: 2px solid var(--accent-cyan);
-    }
-
-    .avatar-picker-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin-bottom: 16px;
-    }
-
-    .avatar-preview-wrapper {
-      position: relative;
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      border: 2px solid var(--accent-cyan);
-      box-shadow: var(--glow-cyan);
-      overflow: hidden;
-      cursor: pointer;
-    }
-
-    .avatar-preview-img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .avatar-upload-overlay {
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.5);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0;
-      transition: opacity 0.2s;
-    }
-
-    .avatar-preview-wrapper:hover .avatar-upload-overlay {
-      opacity: 1;
-    }
-
-    .form-group {
-      margin-bottom: 14px;
-    }
-
-    .form-group label {
-      display: block;
-      font-size: 12px;
-      color: var(--text-muted);
-      margin-bottom: 6px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .input-field {
-      width: 100%;
-      background: rgba(0, 0, 0, 0.4);
-      border: 1px solid var(--border-steel);
-      border-radius: 10px;
-      padding: 12px 14px;
-      color: #fff;
-      font-size: 14px;
-      outline: none;
-      transition: border 0.3s;
-    }
-
-    .input-field:focus {
-      border-color: var(--accent-cyan);
-      box-shadow: 0 0 8px rgba(0, 242, 254, 0.2);
-    }
-
-    .auth-submit-btn {
-      width: 100%;
-      margin-top: 10px;
-      background: linear-gradient(90deg, #00f2fe, #4facfe);
-      border: none;
-      color: #000;
-      font-weight: 700;
-      padding: 14px;
-      border-radius: 10px;
-      cursor: pointer;
-      font-size: 15px;
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-
-    .auth-submit-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--glow-cyan);
-    }
-
-    /* Main Container & Video Feed */
-    .xok-header {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      height: 60px;
-      padding: 0 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      z-index: 100;
-      background: linear-gradient(to bottom, rgba(10, 12, 16, 0.8), transparent);
-      backdrop-filter: blur(10px);
-    }
-
-    .feed-nav {
-      display: flex;
-      gap: 16px;
-    }
-
-    .nav-tab {
-      background: none;
-      border: none;
-      color: var(--text-muted);
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      padding: 6px 12px;
-      border-radius: 20px;
-      transition: all 0.3s;
-    }
-
-    .nav-tab.active {
-      color: #fff;
-      background: rgba(255, 255, 255, 0.1);
-      border: 1px solid var(--border-steel);
-    }
-
-    .header-actions {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .btn-create {
-      background: linear-gradient(90deg, var(--accent-cyan), #00c6ff);
-      color: #000;
-      border: none;
-      font-weight: 700;
-      padding: 8px 16px;
-      border-radius: 20px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 13px;
-    }
-
-    .user-profile-badge {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      border: 1px solid var(--accent-cyan);
-      object-fit: cover;
-      cursor: pointer;
-    }
-
-    /* Content Cards */
-    .xok-container {
-      width: 100vw;
-      height: 100vh;
-      overflow-y: mandatory;
-      scroll-snap-type: y mandatory;
-    }
-
-    .xok-card {
-      position: relative;
-      width: 100vw;
-      height: 100vh;
-      scroll-snap-align: start;
-      scroll-snap-stop: always;
-      background: #000;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .xok-card video, .xok-card img.media-content {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .live-badge {
-      position: absolute;
-      top: 75px;
-      left: 20px;
-      background: var(--accent-pink);
-      padding: 4px 10px;
-      border-radius: 6px;
-      font-weight: bold;
-      font-size: 12px;
-      z-index: 10;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .overlay {
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      padding: 24px 20px;
-      background: linear-gradient(transparent, rgba(10, 12, 16, 0.95));
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-end;
-      z-index: 20;
-    }
-
-    .user-info {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      max-width: 75%;
-    }
-
-    /* ИСПРАВЛЕННЫЙ КОМПАКТНЫЙ АВАТАР */
-    .user-avatar-post {
-      width: 44px !important;
-      height: 44px !important;
-      min-width: 44px !important;
-      border-radius: 50% !important;
-      object-fit: cover !important;
-      border: 2px solid var(--accent-cyan) !important;
-      box-shadow: 0 0 10px rgba(0, 242, 254, 0.3);
-    }
-
-    .follow-btn {
-      background: transparent;
-      border: 1px solid var(--accent-cyan);
-      color: var(--accent-cyan);
-      padding: 3px 8px;
-      border-radius: 12px;
-      font-size: 11px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .follow-btn.followed {
-      background: rgba(255,255,255,0.1);
-      border-color: var(--border-steel);
-      color: var(--text-muted);
-    }
-
-    .side-bar {
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
-      align-items: center;
-    }
-
-    .action-btn {
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid var(--border-steel);
-      width: 46px;
-      height: 46px;
-      border-radius: 50%;
-      color: #fff;
-      cursor: pointer;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      backdrop-filter: blur(10px);
-      transition: all 0.2s;
-    }
-
-    .action-btn:hover {
-      transform: scale(1.1);
-      border-color: var(--accent-cyan);
-      box-shadow: var(--glow-cyan);
-    }
-
-    .action-btn span {
-      font-size: 10px;
-      margin-top: 2px;
-      color: var(--text-muted);
-    }
-
-    /* Modals for Comments & Upload */
-    .modal-bottom {
-      position: fixed;
-      bottom: -100%; left: 0; right: 0;
-      height: 65vh;
-      background: var(--metal-gradient);
-      border-top: 1px solid var(--border-steel);
-      border-radius: 20px 20px 0 0;
-      z-index: 200;
-      transition: bottom 0.3s ease-in-out;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .modal-bottom.active {
-      bottom: 0;
-    }
-
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding-bottom: 14px;
-      border-bottom: 1px solid var(--border-steel);
-    }
-
-    .comments-list {
-      flex: 1;
-      overflow-y: auto;
-      padding: 14px 0;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .comment-item {
-      display: flex;
-      gap: 10px;
-      background: rgba(0, 0, 0, 0.2);
-      padding: 10px;
-      border-radius: 10px;
-    }
-
-    .comment-avatar {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      object-fit: cover;
-    }
-
-    .comment-input-row {
-      display: flex;
-      gap: 10px;
-      padding-top: 10px;
-    }
-
-    .error-toast {
-      position: fixed;
-      top: 80px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(255, 0, 80, 0.9);
-      color: #fff;
-      padding: 10px 20px;
-      border-radius: 30px;
-      font-size: 13px;
-      font-weight: 600;
-      z-index: 1000;
-      display: none;
-      backdrop-filter: blur(10px);
-    }
-  </style>
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-  <!-- SVG Sprite Library -->
+  <!-- SVG Иконки -->
   <svg style="display: none;">
     <symbol id="icon-heart" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></symbol>
     <symbol id="icon-comment" viewBox="0 0 24 24"><path d="M21.99 4c0-1.1-.89-2-1.99-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4-.01-18zM18 14H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/></symbol>
     <symbol id="icon-share" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></symbol>
+    <symbol id="icon-music" viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></symbol>
     <symbol id="icon-plus" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></symbol>
     <symbol id="icon-close" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></symbol>
-    <symbol id="icon-send" viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></symbol>
   </svg>
 
-  <!-- Notification Toast -->
   <div id="errorToast" class="error-toast"></div>
 
-  <!-- Auth Modal -->
+  <!-- Окно Авторизации (Регистрация / Вход) -->
   <div id="authModal" class="auth-overlay">
     <div class="auth-card">
       <div class="auth-tabs">
-        <button class="auth-tab-btn active" onclick="switchAuthMode('register')">Регистрация</button>
-        <button class="auth-tab-btn" onclick="switchAuthMode('login')">Вход</button>
+        <button class="auth-tab-btn active" id="tabRegisterBtn">Регистрация</button>
+        <button class="auth-tab-btn" id="tabLoginBtn">Вход</button>
       </div>
 
-      <div class="avatar-picker-container">
-        <div class="avatar-preview-wrapper" onclick="document.getElementById('customAvatarInput').click()">
-          <img id="avatarPreview" class="avatar-preview-img" src="https://api.dicebear.com/7.x/bottts/svg?seed=XokUser" alt="Avatar">
-          <div class="avatar-upload-overlay">
-            <svg class="icon" style="fill:#fff"><use href="#icon-plus"/></svg>
-          </div>
+      <!-- Форма Регистрации -->
+      <form id="regForm">
+        <div class="avatar-preview-wrapper" id="avatarPicker">
+          <img id="avatarPreview" class="avatar-preview-img" src="assets/avatars/default.svg" alt="Avatar">
         </div>
-        <input type="file" id="customAvatarInput" accept="image/*" style="display:none;" onchange="handleCustomAvatar(event)">
-        <span style="font-size:11px; color:var(--text-muted); margin-top:6px;">Нажмите чтобы сменить фото</span>
-      </div>
+        <input type="file" id="customAvatarInput" accept="image/*" style="display:none;">
+        
+        <div class="form-group">
+          <label>Отображаемое имя (Ник)</label>
+          <input type="text" id="regDisplayName" class="input-field" placeholder="Миша" required>
+        </div>
+        <div class="form-group">
+          <label>Уникальный @username</label>
+          <input type="text" id="regUsername" class="input-field" placeholder="misha_dev" required>
+        </div>
+        <div class="form-group">
+          <label>Пароль</label>
+          <input type="password" id="regPassword" class="input-field" placeholder="••••••••" required>
+        </div>
+        <button type="submit" class="auth-submit-btn">Зарегистрироваться в Xok</button>
+      </form>
 
-      <div class="form-group">
-        <label>Никнейм (Отображаемое имя)</label>
-        <input type="text" id="regDisplayName" class="input-field" placeholder="Алексей 🚀" oninput="updateAvatarPreview()">
-      </div>
-
-      <div class="form-group">
-        <label>Уникальный @username</label>
-        <input type="text" id="regUsername" class="input-field" placeholder="alex_creator" oninput="updateAvatarPreview()">
-      </div>
-
-      <div class="form-group">
-        <label>Пароль</label>
-        <input type="password" id="regPassword" class="input-field" placeholder="••••••••">
-      </div>
-
-      <button class="auth-submit-btn" id="authSubmitBtn" onclick="submitAuth()">Зарегистрироваться в Xok</button>
+      <!-- Форма Входа -->
+      <form id="loginForm" style="display:none;">
+        <div class="form-group">
+          <label>Логин (@username)</label>
+          <input type="text" id="loginUsername" class="input-field" placeholder="@misha_dev" required>
+        </div>
+        <div class="form-group">
+          <label>Пароль</label>
+          <input type="password" id="loginPassword" class="input-field" placeholder="••••••••" required>
+        </div>
+        <button type="submit" class="auth-submit-btn">Войти в Xok</button>
+      </form>
     </div>
   </div>
 
-  <!-- Top Navigation Header -->
+  <!-- Шапка сайта -->
   <header class="xok-header">
     <div class="feed-nav">
-      <button class="nav-tab" onclick="switchTab('following')">Подписки</button>
-      <button class="nav-tab active" onclick="switchTab('forYou')">Для вас</button>
-      <button class="nav-tab" onclick="switchTab('live')">Эфиры</button>
+      <button class="nav-tab" id="tabFollowing">Подписки</button>
+      <button class="nav-tab active" id="tabForYou">Для вас</button>
+      <button class="nav-tab" id="tabLive">Эфиры</button>
     </div>
-    <div class="header-actions">
-      <button class="btn-create" onclick="openUploadModal()">
-        <svg class="icon" style="width:16px; height:16px; fill:#000;"><use href="#icon-plus"/></svg>
+    <div style="display:flex; align-items:center; gap:10px;">
+      <button class="btn-create" id="openUploadBtn">
+        <svg class="icon" style="fill:#000; width:16px; height:16px;"><use href="#icon-plus"/></svg>
         Создать
       </button>
-      <img id="headerUserAvatar" class="user-profile-badge" src="https://api.dicebear.com/7.x/bottts/svg?seed=User" alt="Profile" onclick="logout()">
+      <img id="headerAvatar" class="user-profile-badge" src="assets/avatars/default.svg" alt="Profile">
     </div>
   </header>
 
-  <!-- Scroll Feed Container -->
+  <!-- Лента контента -->
   <div class="xok-container" id="feed"></div>
 
-  <!-- Comments Bottom Modal -->
-  <div id="commentsModal" class="modal-bottom">
-    <div class="modal-header">
-      <h3 style="font-size:16px;">Комментарии</h3>
-      <button onclick="closeCommentsModal()" style="background:none; border:none; color:#fff; cursor:pointer;">
-        <svg class="icon"><use href="#icon-close"/></svg>
-      </button>
+  <!-- Профиль Пользователя -->
+  <div id="profileModal" class="modal-bottom">
+    <div class="profile-header-card">
+      <img id="profileAvatar" class="profile-avatar-large" src="assets/avatars/default.svg" alt="Avatar">
+      <div>
+        <h2 id="profileDisplayName" style="font-size:18px;"></h2>
+        <span id="profileUsername" style="font-size:13px; color:var(--text-muted);"></span>
+        <div style="display:flex; gap:12px; margin-top:8px; font-size:12px;">
+          <span>Подписчики: <strong id="profileFollowers">0</strong></span>
+          <span>Лайки: <strong id="profileLikes">0</strong></span>
+        </div>
+      </div>
+      <button id="profileLogoutBtn" style="margin-left:auto; background:none; border:1px solid var(--accent-pink); color:var(--accent-pink); padding:6px 10px; border-radius:10px; font-size:12px; cursor:pointer;">Выйти</button>
     </div>
-    <div class="comments-list" id="commentsList"></div>
-    <div class="comment-input-row">
-      <input type="text" id="commentInput" class="input-field" placeholder="Написать комментарий...">
-      <button onclick="submitComment()" class="action-btn" style="width:44px; height:44px; border-radius:10px;">
-        <svg class="icon"><use href="#icon-send"/></svg>
-      </button>
-    </div>
+    <div class="profile-grid" id="profilePostsGrid"></div>
   </div>
 
-  <!-- Upload Content Modal -->
+  <!-- Окно публикации видео/фото -->
   <div id="uploadModal" class="modal-bottom" style="height:80vh;">
-    <div class="modal-header">
-      <h3 style="font-size:16px;">Опубликовать контент</h3>
-      <button onclick="closeUploadModal()" style="background:none; border:none; color:#fff; cursor:pointer;">
-        <svg class="icon"><use href="#icon-close"/></svg>
-      </button>
+    <div style="display:flex; justify-content:space-between; align-items:center; padding-bottom:10px;">
+      <h3>Публикация контента</h3>
+      <button id="closeUploadBtn" style="background:none; border:none; color:#fff; cursor:pointer;"><svg class="icon"><use href="#icon-close"/></svg></button>
     </div>
-    <div style="padding:16px 0; overflow-y:auto; flex:1;">
+    <div style="overflow-y:auto; flex:1;">
       <div class="form-group">
-        <label>Выберите медиафайл</label>
-        <input type="file" id="uploadFileInput" class="input-field" accept="video/*,image/*" onchange="handleFileSelect(event)">
+        <label>Медиафайл (Сохраняется в assets/videos или assets/photos)</label>
+        <input type="file" id="uploadFile" class="input-field" accept="video/*,image/*">
       </div>
-      <div id="uploadStatus" style="font-size:12px; color:var(--accent-cyan); margin-bottom:12px;"></div>
       <div class="form-group">
-        <label>Категория</label>
-        <select id="uploadCategory" class="input-field" style="background:#111;">
-          <option value="shorts">Shorts (Видео)</option>
-          <option value="stream">Прямой эфир (LIVE)</option>
-          <option value="photo">Фотография</option>
+        <label>Музыкальная дорожка (из assets/music)</label>
+        <select id="uploadMusicSelect" class="input-field">
+          <option value="Оригинальный звук">🎵 Оригинальный звук</option>
+          <option value="Phonk Drift — Xok Audio">🔥 Phonk Drift — Xok Audio</option>
+          <option value="Chill Lofi Beats">🎧 Chill Lofi Beats</option>
         </select>
       </div>
       <div class="form-group">
-        <label>Описание публикаций</label>
-        <textarea id="uploadDescription" class="input-field" rows="3" placeholder="Расскажите о чем ваш ролик..."></textarea>
+        <label>Описание ролику</label>
+        <textarea id="uploadDesc" class="input-field" rows="3" placeholder="Расскажите о ролике..."></textarea>
       </div>
-      <button class="auth-submit-btn" onclick="submitPost()">Опубликовать в Xok</button>
+      <button class="auth-submit-btn" id="submitPostBtn">Опубликовать</button>
     </div>
   </div>
 
-  <script>
-    // System State & Databases
-    let currentUser = null;
-    let authMode = 'register';
-    let activeTab = 'forYou';
-    let currentPostIdForComments = null;
-    let customAvatarBase64 = null;
-    let followedUsers = new Set();
-
-    // Extended Moderation Database
-    const BAD_WORDS_LIST = [
-      "бля", "блядь", "блять", "хуй", "хуя", "хуесос", "пидор", "пидр", "пидорас", "чмо", "чмошник", 
-      "ебать", "ебал", "еблан", "гандон", "презерватив", "порно", "18+", "fuck", "cock", "cunt", "sex"
-    ];
-
-    let posts = [
-      {
-        id: 1,
-        type: 'video',
-        isLive: false,
-        src: 'https://assets.mixkit.co/videos/preview/mixkit-tree-branches-in-the-breeze-1187-large.mp4',
-        displayName: 'Алексей Разраб',
-        username: '@alex_dev',
-        avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=alex',
-        description: 'Тестируем новый плеер в Xok! 🚀 #xok #dev',
-        likes: 12400,
-        comments: [
-          { displayName: 'Иван', username: '@ivan', avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=ivan', text: 'Крутой интерфейс!' }
-        ]
-      },
-      {
-        id: 2,
-        type: 'live',
-        isLive: true,
-        src: 'https://assets.mixkit.co/videos/preview/mixkit-hands-holding-a-smartphone-40748-large.mp4',
-        displayName: 'Gamer Pro',
-        username: '@gamer_pro',
-        avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=gamer',
-        description: 'Прямой эфир: Разбираем фичи Xok!',
-        likes: 45100,
-        comments: []
-      }
-    ];
-
-    // Initialization
-    window.onload = () => {
-      loadSession();
-      renderFeed();
-    };
-
-    function loadSession() {
-      const saved = localStorage.getItem('xok_user');
-      if (saved) {
-        currentUser = JSON.parse(saved);
-        document.getElementById('authModal').style.display = 'none';
-        document.getElementById('headerUserAvatar').src = currentUser.avatar;
-      }
-    }
-
-    function switchAuthMode(mode) {
-      authMode = mode;
-      document.querySelectorAll('.auth-tab-btn').forEach(btn => btn.classList.remove('active'));
-      if (mode === 'register') {
-        document.querySelectorAll('.auth-tab-btn')[0].classList.add('active');
-        document.getElementById('authSubmitBtn').innerText = 'Зарегистрироваться в Xok';
-      } else {
-        document.querySelectorAll('.auth-tab-btn')[1].classList.add('active');
-        document.getElementById('authSubmitBtn').innerText = 'Войти в аккаунт';
-      }
-    }
-
-    function handleCustomAvatar(event) {
-      const file = event.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          customAvatarBase64 = e.target.result;
-          document.getElementById('avatarPreview').src = customAvatarBase64;
-        };
-        reader.readAsDataURL(file);
-      }
-    }
-
-    function updateAvatarPreview() {
-      if (!customAvatarBase64) {
-        const username = document.getElementById('regUsername').value || 'User';
-        document.getElementById('avatarPreview').src = `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(username)}`;
-      }
-    }
-
-    function checkContentSafety(text) {
-      if (!text) return { safe: true };
-      const normalized = text.toLowerCase().replace(/[\s._\-+*,\/]/g, '').replace(/0/g, 'о').replace(/1/g, 'и');
-      for (let word of BAD_WORDS_LIST) {
-        if (normalized.includes(word)) {
-          return { safe: false, reason: `Контент содержит запрещенное слово/тег: "${word}"` };
-        }
-      }
-      return { safe: true };
-    }
-
-    function showToast(msg) {
-      const toast = document.getElementById('errorToast');
-      toast.innerText = msg;
-      toast.style.display = 'block';
-      setTimeout(() => { toast.style.display = 'none'; }, 3000);
-    }
-
-    function submitAuth() {
-      const displayName = document.getElementById('regDisplayName').value.trim();
-      const username = document.getElementById('regUsername').value.trim();
-
-      if (!username || !displayName) {
-        showToast('Заполните имя и username!');
-        return;
-      }
-
-      const check = checkContentSafety(displayName + " " + username);
-      if (!check.safe) {
-        showToast(check.reason);
-        return;
-      }
-
-      currentUser = {
-        displayName: displayName,
-        username: username.startsWith('@') ? username : '@' + username,
-        avatar: customAvatarBase64 || `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(username)}`
-      };
-
-      localStorage.setItem('xok_user', JSON.stringify(currentUser));
-      document.getElementById('headerUserAvatar').src = currentUser.avatar;
-      document.getElementById('authModal').style.display = 'none';
-      showToast(`Добро пожаловать, ${currentUser.displayName}!`);
-    }
-
-    function logout() {
-      localStorage.removeItem('xok_user');
-      currentUser = null;
-      document.getElementById('authModal').style.display = 'flex';
-    }
-
-    function renderFeed() {
-      const feed = document.getElementById('feed');
-      feed.innerHTML = '';
-
-      let filteredPosts = posts;
-      if (activeTab === 'live') {
-        filteredPosts = posts.filter(p => p.isLive);
-      } else if (activeTab === 'following') {
-        filteredPosts = posts.filter(p => followedUsers.has(p.username));
-      }
-
-      if (filteredPosts.length === 0) {
-        feed.innerHTML = `<div style="display:flex; justify-content:center; align-items:center; height:100%; color:var(--text-muted);">Нет публикаций в этой категории</div>`;
-        return;
-      }
-
-      filteredPosts.forEach(post => {
-        const isFollowed = followedUsers.has(post.username);
-        const card = document.createElement('div');
-        card.className = 'xok-card';
-        card.innerHTML = `
-          ${post.isLive ? '<div class="live-badge">🔴 LIVE</div>' : ''}
-          <video loop playsinline muted src="${post.src}" onclick="togglePlay(this)"></video>
-          <div class="overlay">
-            <div class="user-info">
-              <img src="${post.avatar}" class="user-avatar-post" alt="Avatar">
-              <div>
-                <div style="display:flex; align-items:center; gap:8px;">
-                  <strong style="font-size:14px;">${escapeHTML(post.displayName)}</strong>
-                  <span style="font-size:12px; color:var(--text-muted);">${escapeHTML(post.username)}</span>
-                  <button class="follow-btn ${isFollowed ? 'followed' : ''}" onclick="toggleFollow('${post.username}')">
-                    ${isFollowed ? 'Вы подписаны' : '+ Подписаться'}
-                  </button>
-                </div>
-                <p style="font-size:13px; margin-top:4px;">${escapeHTML(post.description)}</p>
-              </div>
-            </div>
-            <div class="side-bar">
-              <button class="action-btn" onclick="toggleLike(this, ${post.id})">
-                <svg class="icon"><use href="#icon-heart"/></svg>
-                <span>${post.likes}</span>
-              </button>
-              <button class="action-btn" onclick="openCommentsModal(${post.id})">
-                <svg class="icon"><use href="#icon-comment"/></svg>
-                <span>${post.comments.length}</span>
-              </button>
-              <button class="action-btn" onclick="sharePost(${post.id})">
-                <svg class="icon"><use href="#icon-share"/></svg>
-              </button>
-            </div>
-          </div>
-        `;
-        feed.appendChild(card);
-      });
-
-      setupVideoObserver();
-    }
-
-    function setupVideoObserver() {
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            entry.target.play().catch(() => {});
-          } else {
-            entry.target.pause();
-          }
-        });
-      }, { threshold: 0.6 });
-
-      document.querySelectorAll('video').forEach(v => observer.observe(v));
-    }
-
-    function togglePlay(video) {
-      if (video.paused) video.play();
-      else video.pause();
-    }
-
-    function switchTab(tab) {
-      activeTab = tab;
-      document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-      event.target.classList.add('active');
-      renderFeed();
-    }
-
-    function toggleFollow(username) {
-      if (followedUsers.has(username)) {
-        followedUsers.delete(username);
-      } else {
-        followedUsers.add(username);
-      }
-      renderFeed();
-    }
-
-    function toggleLike(btn, postId) {
-      const post = posts.find(p => p.id === postId);
-      if (post) {
-        post.likes++;
-        btn.querySelector('span').innerText = post.likes;
-        btn.style.color = 'var(--accent-pink)';
-      }
-    }
-
-    function openCommentsModal(postId) {
-      currentPostIdForComments = postId;
-      const modal = document.getElementById('commentsModal');
-      const list = document.getElementById('commentsList');
-      const post = posts.find(p => p.id === postId);
-
-      list.innerHTML = '';
-      post.comments.forEach(c => {
-        list.innerHTML += `
-          <div class="comment-item">
-            <img src="${c.avatar}" class="comment-avatar" alt="Avatar">
-            <div>
-              <strong style="font-size:12px; color:var(--accent-cyan);">${escapeHTML(c.displayName)}</strong>
-              <p style="font-size:13px; margin-top:2px;">${escapeHTML(c.text)}</p>
-            </div>
-          </div>
-        `;
-      });
-
-      modal.classList.add('active');
-    }
-
-    function closeCommentsModal() {
-      document.getElementById('commentsModal').classList.remove('active');
-    }
-
-    function submitComment() {
-      const input = document.getElementById('commentInput');
-      const text = input.value.trim();
-
-      if (!text) return;
-      const check = checkContentSafety(text);
-      if (!check.safe) {
-        showToast(check.reason);
-        return;
-      }
-
-      const post = posts.find(p => p.id === currentPostIdForComments);
-      if (post && currentUser) {
-        post.comments.push({
-          displayName: currentUser.displayName,
-          username: currentUser.username,
-          avatar: currentUser.avatar,
-          text: text
-        });
-        input.value = '';
-        openCommentsModal(currentPostIdForComments);
-        renderFeed();
-      }
-    }
-
-    function openUploadModal() {
-      if (!currentUser) {
-        document.getElementById('authModal').style.display = 'flex';
-        return;
-      }
-      document.getElementById('uploadModal').classList.add('active');
-    }
-
-    function closeUploadModal() {
-      document.getElementById('uploadModal').classList.remove('active');
-    }
-
-    function handleFileSelect(e) {
-      const file = e.target.files[0];
-      if (file) {
-        document.getElementById('uploadStatus').innerText = `Файл выбран (${(file.size / 1024 / 1024).toFixed(2)} MB). Оптимизация...`;
-      }
-    }
-
-    function submitPost() {
-      const desc = document.getElementById('uploadDescription').value.trim();
-      const cat = document.getElementById('uploadCategory').value;
-      const fileInput = document.getElementById('uploadFileInput');
-
-      if (!fileInput.files[0]) {
-        showToast('Выберите медиафайл!');
-        return;
-      }
-
-      const check = checkContentSafety(desc);
-      if (!check.safe) {
-        showToast(check.reason);
-        return;
-      }
-
-      const file = fileInput.files[0];
-      const src = URL.createObjectURL(file);
-
-      posts.unshift({
-        id: Date.now(),
-        type: cat,
-        isLive: cat === 'stream',
-        src: src,
-        displayName: currentUser.displayName,
-        username: currentUser.username,
-        avatar: currentUser.avatar,
-        description: desc,
-        likes: 0,
-        comments: []
-      });
-
-      closeUploadModal();
-      renderFeed();
-      showToast('Публикация успешно размещена!');
-    }
-
-    function sharePost(id) {
-      navigator.clipboard.writeText(window.location.href);
-      showToast('Ссылка на Xok скопирована!');
-    }
-
-    function escapeHTML(str) {
-      return str.replace(/[&<>'"]/g, 
-        tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
-      );
-    }
-  </script>
+  <!-- Подключение скриптов модулей -->
+  <script type="module" src="js/auth.js"></script>
+  <script type="module" src="js/feed.js"></script>
 </body>
 </html>
