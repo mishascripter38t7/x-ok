@@ -1,0 +1,13 @@
+# IDE & Editors
+.vscode/
+.idea/
+*.swp
+*.tmp
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Logs & cache
+*.log
+node_modules/
