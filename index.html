@@ -4,132 +4,306 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Xok — Shorts, Photos & Streams</title>
-  <link rel="stylesheet" href="css/style.css">
+  <style>
+    :root {
+      --bg-dark: #0a0c10;
+      --card-bg: rgba(18, 22, 31, 0.85);
+      --border-steel: rgba(255, 255, 255, 0.12);
+      --accent-cyan: #00f2fe;
+      --accent-pink: #ff0050;
+      --text-main: #f0f4f8;
+      --text-muted: #8a99ad;
+      --metal-gradient: linear-gradient(135deg, #1c2333 0%, #0d1117 50%, #161b22 100%);
+      --glow-cyan: 0 0 15px rgba(0, 242, 254, 0.35);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; user-select: none; }
+    body, html { width: 100%; height: 100%; background: var(--bg-dark); color: var(--text-main); overflow: hidden; }
+
+    .icon { width: 22px; height: 22px; fill: currentColor; }
+
+    /* Auth Modal */
+    .auth-overlay {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(5, 7, 10, 0.95); backdrop-filter: blur(20px);
+      z-index: 1000; display: flex; justify-content: center; align-items: center; padding: 20px;
+    }
+
+    .auth-card {
+      width: 100%; max-width: 400px; background: var(--metal-gradient);
+      border: 1px solid var(--border-steel); box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), var(--glow-cyan);
+      border-radius: 20px; padding: 24px;
+    }
+
+    .auth-tabs { display: flex; gap: 10px; margin-bottom: 18px; border-bottom: 1px solid var(--border-steel); padding-bottom: 10px; }
+    .auth-tab-btn { flex: 1; background: none; border: none; color: var(--text-muted); font-weight: 700; font-size: 14px; padding: 8px; cursor: pointer; }
+    .auth-tab-btn.active { color: var(--accent-cyan); border-bottom: 2px solid var(--accent-cyan); }
+
+    .avatar-preview-wrapper { width: 70px; height: 70px; margin: 0 auto 14px auto; border-radius: 50%; border: 2px solid var(--accent-cyan); overflow: hidden; cursor: pointer; }
+    .avatar-preview-img { width: 100%; height: 100%; object-fit: cover; }
+
+    .form-group { margin-bottom: 12px; }
+    .form-group label { display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 4px; text-transform: uppercase; }
+    .input-field { width: 100%; background: rgba(0, 0, 0, 0.5); border: 1px solid var(--border-steel); border-radius: 10px; padding: 10px 12px; color: #fff; font-size: 14px; outline: none; }
+    .auth-submit-btn { width: 100%; margin-top: 10px; background: linear-gradient(90deg, #00f2fe, #4facfe); border: none; color: #000; font-weight: 700; padding: 12px; border-radius: 10px; cursor: pointer; }
+
+    /* Header */
+    .xok-header {
+      position: fixed; top: 0; left: 0; right: 0; height: 60px; padding: 0 16px;
+      display: flex; justify-content: space-between; align-items: center; z-index: 100;
+      background: linear-gradient(to bottom, rgba(10, 12, 16, 0.9), transparent); backdrop-filter: blur(10px);
+    }
+    .feed-nav { display: flex; gap: 12px; }
+    .nav-tab { background: none; border: none; color: var(--text-muted); font-size: 14px; font-weight: 600; cursor: pointer; padding: 6px 12px; border-radius: 20px; }
+    .nav-tab.active { color: #fff; background: rgba(255, 255, 255, 0.1); border: 1px solid var(--border-steel); }
+
+    .btn-create { background: linear-gradient(90deg, var(--accent-cyan), #00c6ff); color: #000; border: none; font-weight: 700; padding: 8px 14px; border-radius: 20px; cursor: pointer; display: flex; align-items: center; gap: 4px; font-size: 13px; }
+    .user-profile-badge { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--accent-cyan); object-fit: cover; cursor: pointer; }
+
+    /* Feed */
+    .xok-container { width: 100vw; height: 100vh; overflow-y: mandatory; scroll-snap-type: y mandatory; }
+    .xok-card { position: relative; width: 100vw; height: 100vh; scroll-snap-align: start; scroll-snap-stop: always; background: #000; display: flex; justify-content: center; align-items: center; }
+    .xok-card video { width: 100%; height: 100%; object-fit: cover; }
+
+    .overlay { position: absolute; bottom: 0; left: 0; right: 0; padding: 20px; background: linear-gradient(transparent, rgba(10, 12, 16, 0.95)); display: flex; justify-content: space-between; align-items: flex-end; z-index: 20; }
+    .user-info { display: flex; align-items: center; gap: 10px; max-width: 75%; }
+    .user-avatar-post { width: 44px !important; height: 44px !important; min-width: 44px !important; border-radius: 50% !important; object-fit: cover !important; border: 2px solid var(--accent-cyan) !important; cursor: pointer; }
+
+    .side-bar { display: flex; flex-direction: column; gap: 16px; align-items: center; }
+    .action-btn { background: rgba(255, 255, 255, 0.08); border: 1px solid var(--border-steel); width: 44px; height: 44px; border-radius: 50%; color: #fff; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+
+    /* Modals */
+    .modal-bottom { position: fixed; bottom: -100%; left: 0; right: 0; height: 75vh; background: var(--metal-gradient); border-top: 1px solid var(--border-steel); border-radius: 20px 20px 0 0; z-index: 200; transition: bottom 0.3s ease-in-out; padding: 20px; display: flex; flex-direction: column; }
+    .modal-bottom.active { bottom: 0; }
+
+    .error-toast { position: fixed; top: 75px; left: 50%; transform: translateX(-50%); background: rgba(255, 0, 80, 0.9); color: #fff; padding: 8px 18px; border-radius: 30px; font-size: 12px; font-weight: 600; z-index: 1000; display: none; }
+  </style>
 </head>
 <body>
 
-  <!-- SVG Иконки -->
   <svg style="display: none;">
     <symbol id="icon-heart" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></symbol>
     <symbol id="icon-comment" viewBox="0 0 24 24"><path d="M21.99 4c0-1.1-.89-2-1.99-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4-.01-18zM18 14H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/></symbol>
     <symbol id="icon-share" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></symbol>
-    <symbol id="icon-music" viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></symbol>
     <symbol id="icon-plus" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></symbol>
     <symbol id="icon-close" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></symbol>
   </svg>
 
   <div id="errorToast" class="error-toast"></div>
 
-  <!-- Окно Авторизации (Регистрация / Вход) -->
+  <!-- Auth -->
   <div id="authModal" class="auth-overlay">
     <div class="auth-card">
       <div class="auth-tabs">
-        <button class="auth-tab-btn active" id="tabRegisterBtn">Регистрация</button>
-        <button class="auth-tab-btn" id="tabLoginBtn">Вход</button>
+        <button class="auth-tab-btn active" id="tabReg" onclick="switchAuth('reg')">Регистрация</button>
+        <button class="auth-tab-btn" id="tabLog" onclick="switchAuth('log')">Вход</button>
       </div>
 
-      <!-- Форма Регистрации -->
-      <form id="regForm">
-        <div class="avatar-preview-wrapper" id="avatarPicker">
-          <img id="avatarPreview" class="avatar-preview-img" src="assets/avatars/default.svg" alt="Avatar">
+      <div id="regForm">
+        <div class="avatar-preview-wrapper" onclick="document.getElementById('avatarFile').click()">
+          <img id="avatarPreview" class="avatar-preview-img" src="https://api.dicebear.com/7.x/bottts/svg?seed=Xok" alt="Avatar">
         </div>
-        <input type="file" id="customAvatarInput" accept="image/*" style="display:none;">
-        
-        <div class="form-group">
-          <label>Отображаемое имя (Ник)</label>
-          <input type="text" id="regDisplayName" class="input-field" placeholder="Миша" required>
-        </div>
-        <div class="form-group">
-          <label>Уникальный @username</label>
-          <input type="text" id="regUsername" class="input-field" placeholder="misha_dev" required>
-        </div>
-        <div class="form-group">
-          <label>Пароль</label>
-          <input type="password" id="regPassword" class="input-field" placeholder="••••••••" required>
-        </div>
-        <button type="submit" class="auth-submit-btn">Зарегистрироваться в Xok</button>
-      </form>
+        <input type="file" id="avatarFile" accept="image/*" style="display:none;" onchange="handleAvatar(event)">
+        <div class="form-group"><label>Никнейм</label><input type="text" id="regDN" class="input-field" placeholder="Миша"></div>
+        <div class="form-group"><label>@username</label><input type="text" id="regUN" class="input-field" placeholder="misha_dev"></div>
+        <div class="form-group"><label>Пароль</label><input type="password" id="regPW" class="input-field" placeholder="••••••••"></div>
+        <button class="auth-submit-btn" onclick="submitReg()">Создать аккаунт Xok</button>
+      </div>
 
-      <!-- Форма Входа -->
-      <form id="loginForm" style="display:none;">
-        <div class="form-group">
-          <label>Логин (@username)</label>
-          <input type="text" id="loginUsername" class="input-field" placeholder="@misha_dev" required>
-        </div>
-        <div class="form-group">
-          <label>Пароль</label>
-          <input type="password" id="loginPassword" class="input-field" placeholder="••••••••" required>
-        </div>
-        <button type="submit" class="auth-submit-btn">Войти в Xok</button>
-      </form>
+      <div id="logForm" style="display:none;">
+        <div class="form-group"><label>@username</label><input type="text" id="logUN" class="input-field" placeholder="@misha_dev"></div>
+        <div class="form-group"><label>Пароль</label><input type="password" id="logPW" class="input-field" placeholder="••••••••"></div>
+        <button class="auth-submit-btn" onclick="submitLog()">Войти в Xok</button>
+      </div>
     </div>
   </div>
 
-  <!-- Шапка сайта -->
+  <!-- Header -->
   <header class="xok-header">
     <div class="feed-nav">
-      <button class="nav-tab" id="tabFollowing">Подписки</button>
-      <button class="nav-tab active" id="tabForYou">Для вас</button>
-      <button class="nav-tab" id="tabLive">Эфиры</button>
+      <button class="nav-tab active">Для вас</button>
     </div>
     <div style="display:flex; align-items:center; gap:10px;">
-      <button class="btn-create" id="openUploadBtn">
-        <svg class="icon" style="fill:#000; width:16px; height:16px;"><use href="#icon-plus"/></svg>
-        Создать
-      </button>
-      <img id="headerAvatar" class="user-profile-badge" src="assets/avatars/default.svg" alt="Profile">
+      <button class="btn-create" onclick="openUpload()"><svg class="icon" style="fill:#000; width:16px; height:16px;"><use href="#icon-plus"/></svg> Создать</button>
+      <img id="headerAvatar" class="user-profile-badge" src="https://api.dicebear.com/7.x/bottts/svg?seed=Xok" alt="Profile" onclick="logout()">
     </div>
   </header>
 
-  <!-- Лента контента -->
+  <!-- Feed -->
   <div class="xok-container" id="feed"></div>
 
-  <!-- Профиль Пользователя -->
-  <div id="profileModal" class="modal-bottom">
-    <div class="profile-header-card">
-      <img id="profileAvatar" class="profile-avatar-large" src="assets/avatars/default.svg" alt="Avatar">
-      <div>
-        <h2 id="profileDisplayName" style="font-size:18px;"></h2>
-        <span id="profileUsername" style="font-size:13px; color:var(--text-muted);"></span>
-        <div style="display:flex; gap:12px; margin-top:8px; font-size:12px;">
-          <span>Подписчики: <strong id="profileFollowers">0</strong></span>
-          <span>Лайки: <strong id="profileLikes">0</strong></span>
-        </div>
-      </div>
-      <button id="profileLogoutBtn" style="margin-left:auto; background:none; border:1px solid var(--accent-pink); color:var(--accent-pink); padding:6px 10px; border-radius:10px; font-size:12px; cursor:pointer;">Выйти</button>
-    </div>
-    <div class="profile-grid" id="profilePostsGrid"></div>
-  </div>
-
-  <!-- Окно публикации видео/фото -->
-  <div id="uploadModal" class="modal-bottom" style="height:80vh;">
+  <!-- Upload Modal -->
+  <div id="uploadModal" class="modal-bottom" style="height:70vh;">
     <div style="display:flex; justify-content:space-between; align-items:center; padding-bottom:10px;">
       <h3>Публикация контента</h3>
-      <button id="closeUploadBtn" style="background:none; border:none; color:#fff; cursor:pointer;"><svg class="icon"><use href="#icon-close"/></svg></button>
+      <button onclick="closeUpload()" style="background:none; border:none; color:#fff; cursor:pointer;"><svg class="icon"><use href="#icon-close"/></svg></button>
     </div>
     <div style="overflow-y:auto; flex:1;">
-      <div class="form-group">
-        <label>Медиафайл (Сохраняется в assets/videos или assets/photos)</label>
-        <input type="file" id="uploadFile" class="input-field" accept="video/*,image/*">
-      </div>
-      <div class="form-group">
-        <label>Музыкальная дорожка (из assets/music)</label>
-        <select id="uploadMusicSelect" class="input-field">
-          <option value="Оригинальный звук">🎵 Оригинальный звук</option>
-          <option value="Phonk Drift — Xok Audio">🔥 Phonk Drift — Xok Audio</option>
-          <option value="Chill Lofi Beats">🎧 Chill Lofi Beats</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Описание ролику</label>
-        <textarea id="uploadDesc" class="input-field" rows="3" placeholder="Расскажите о ролике..."></textarea>
-      </div>
-      <button class="auth-submit-btn" id="submitPostBtn">Опубликовать</button>
+      <div class="form-group"><label>Медиафайл</label><input type="file" id="upFile" class="input-field" accept="video/*,image/*"></div>
+      <div class="form-group"><label>Описание</label><textarea id="upDesc" class="input-field" rows="3" placeholder="Расскажите о ролике..."></textarea></div>
+      <button class="auth-submit-btn" onclick="submitPost()">Опубликовать</button>
     </div>
   </div>
 
-  <!-- Подключение скриптов модулей -->
-  <script type="module" src="js/auth.js"></script>
-  <script type="module" src="js/feed.js"></script>
+  <script>
+    let currentUser = null;
+    let registeredUsers = {};
+    let customAvatar = null;
+    const BAD_WORDS = ["бля", "блять", "хуй", "хуесос", "пидор", "пидр", "чмо", "ебать", "гандон", "порно", "18+"];
+
+    let posts = [
+      {
+        id: 1,
+        src: 'https://assets.mixkit.co/videos/preview/mixkit-tree-branches-in-the-breeze-1187-large.mp4',
+        displayName: 'Михаил',
+        username: '@misha_dev',
+        avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=misha',
+        description: 'Первый пост на платформе Xok! 🚀 #xok',
+        likes: 15
+      }
+    ];
+
+    window.onload = () => {
+      const u = localStorage.getItem('xok_users');
+      if (u) registeredUsers = JSON.parse(u);
+      const c = localStorage.getItem('xok_cur');
+      if (c) {
+        currentUser = JSON.parse(c);
+        document.getElementById('authModal').style.display = 'none';
+        document.getElementById('headerAvatar').src = currentUser.avatar;
+      }
+      renderFeed();
+    };
+
+    function switchAuth(tab) {
+      if (tab === 'reg') {
+        document.getElementById('tabReg').classList.add('active');
+        document.getElementById('tabLog').classList.remove('active');
+        document.getElementById('regForm').style.display = 'block';
+        document.getElementById('logForm').style.display = 'none';
+      } else {
+        document.getElementById('tabLog').classList.add('active');
+        document.getElementById('tabReg').classList.remove('active');
+        document.getElementById('regForm').style.display = 'none';
+        document.getElementById('logForm').style.display = 'block';
+      }
+    }
+
+    function handleAvatar(e) {
+      const f = e.target.files[0];
+      if (f) {
+        const r = new FileReader();
+        r.onload = (ev) => { customAvatar = ev.target.result; document.getElementById('avatarPreview').src = customAvatar; };
+        r.readAsDataURL(f);
+      }
+    }
+
+    function checkSafety(t) {
+      if (!t) return true;
+      const c = t.toLowerCase().replace(/[\s._\-+*]/g, '');
+      return !BAD_WORDS.some(w => c.includes(w));
+    }
+
+    function toast(m) {
+      const t = document.getElementById('errorToast');
+      t.innerText = m; t.style.display = 'block';
+      setTimeout(() => t.style.display = 'none', 3000);
+    }
+
+    function submitReg() {
+      const dn = document.getElementById('regDN').value.trim();
+      let un = document.getElementById('regUN').value.trim();
+      const pw = document.getElementById('regPW').value.trim();
+      if (!dn || !un || !pw) return toast('Заполните все поля!');
+      if (!un.startsWith('@')) un = '@' + un;
+      if (!checkSafety(dn + " " + un)) return toast('Ненормативная лексика!');
+
+      currentUser = { displayName: dn, username: un, password: pw, avatar: customAvatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${un}` };
+      registeredUsers[un] = currentUser;
+      localStorage.setItem('xok_users', JSON.stringify(registeredUsers));
+      localStorage.setItem('xok_cur', JSON.stringify(currentUser));
+      document.getElementById('headerAvatar').src = currentUser.avatar;
+      document.getElementById('authModal').style.display = 'none';
+    }
+
+    function submitLog() {
+      let un = document.getElementById('logUN').value.trim();
+      const pw = document.getElementById('logPW').value.trim();
+      if (!un.startsWith('@')) un = '@' + un;
+      if (registeredUsers[un] && registeredUsers[un].password === pw) {
+        currentUser = registeredUsers[un];
+        localStorage.setItem('xok_cur', JSON.stringify(currentUser));
+        document.getElementById('headerAvatar').src = currentUser.avatar;
+        document.getElementById('authModal').style.display = 'none';
+      } else {
+        toast('Неверный логин или пароль!');
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem('xok_cur');
+      location.reload();
+    }
+
+    function renderFeed() {
+      const feed = document.getElementById('feed');
+      feed.innerHTML = '';
+      posts.forEach(p => {
+        const card = document.createElement('div');
+        card.className = 'xok-card';
+        card.innerHTML = `
+          <video loop playsinline muted src="${p.src}" onclick="if(this.paused)this.play();else this.pause();"></video>
+          <div class="overlay">
+            <div class="user-info">
+              <img src="${p.avatar}" class="user-avatar-post">
+              <div>
+                <strong>${escape(p.displayName)}</strong> <span style="font-size:12px; opacity:0.6;">${escape(p.username)}</span>
+                <p style="font-size:13px; margin-top:4px;">${escape(p.description)}</p>
+              </div>
+            </div>
+            <div class="side-bar">
+              <button class="action-btn" onclick="this.querySelector('span').innerText=++p.likes;">
+                <svg class="icon"><use href="#icon-heart"/></svg>
+                <span>${p.likes}</span>
+              </button>
+            </div>
+          </div>
+        `;
+        feed.appendChild(card);
+      });
+      setupObserver();
+    }
+
+    function setupObserver() {
+      const obs = new IntersectionObserver((entries) => {
+        entries.forEach(e => { if (e.isIntersecting) e.target.play().catch(()=>{}); else e.target.pause(); });
+      }, { threshold: 0.6 });
+      document.querySelectorAll('video').forEach(v => obs.observe(v));
+    }
+
+    function openUpload() { document.getElementById('uploadModal').classList.add('active'); }
+    function closeUpload() { document.getElementById('uploadModal').classList.remove('active'); }
+
+    function submitPost() {
+      const f = document.getElementById('upFile').files[0];
+      const d = document.getElementById('upDesc').value.trim();
+      if (!f) return toast('Выберите медиафайл!');
+      if (!checkSafety(d)) return toast('Запрещенный контент!');
+
+      posts.unshift({
+        id: Date.now(),
+        src: URL.createObjectURL(f),
+        displayName: currentUser ? currentUser.displayName : 'Гость',
+        username: currentUser ? currentUser.username : '@guest',
+        avatar: currentUser ? currentUser.avatar : 'https://api.dicebear.com/7.x/bottts/svg?seed=guest',
+        description: d,
+        likes: 0
+      });
+      closeUpload();
+      renderFeed();
+    }
+
+    function escape(s) { return s.replace(/[&<>'"]/g, t => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[t] || t)); }
+  </script>
 </body>
 </html>
